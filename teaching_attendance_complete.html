@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teaching Attendance Manager - Complete</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0D0D0D;
+      --surface: #161616;
+      --surface2: #1F1F1F;
+      --border: #2A2A2A;
+      --text: #F0F0F0;
+      --muted: #666;
+      --accent: #E8C547;
+      --accent2: #4CAF7D;
+      --present: #4CAF7D;
+      --absent: #E05252;
+      --recording: #B07FE8;
+      --alternate: #5B9BD5;
+      --font-display: 'Instrument Serif', serif;
+      --font-mono: 'DM Mono', monospace;
+      --font-body: 'Geist', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; }
+    
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
+    }
+
+    .logo { font-family: var(--font-display); font-size: 22px; color: var(--accent); letter-spacing: -0.5px; }
+    .logo span { color: var(--text); font-style: italic; }
+
+    .header-center { display: flex; gap: 15px; align-items: center; }
+
+    .mode-toggle {
+      display: flex;
+      gap: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 4px;
+    }
+
+    .mode-btn {
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--muted);
+      border-radius: 6px;
+      transition: all 0.2s;
+      font-family: var(--font-body);
+    }
+
+    .mode-btn.active { background: var(--accent); color: #000; }
+    .mode-btn:hover:not(.active) { color: var(--text); }
+
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+
+    .tabs { display: flex; gap: 2px; padding: 16px 32px 0; border-bottom: 1px solid var(--border); overflow-x: auto; }
+
+    .tab {
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      background: none;
+      border: none;
+      font-family: var(--font-body);
+      white-space: nowrap;
+    }
+
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    .main { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+    .section-title { font-family: var(--font-display); font-size: 28px; color: var(--text); }
+    .section-title em { color: var(--accent); font-style: italic; }
+
+    .btn {
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font-body);
+      transition: all 0.15s;
+    }
+
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: #f0d050; }
+    .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-danger { background: #2a1010; color: var(--absent); border: 1px solid #3a1515; }
+    .btn-danger:hover { background: #3a1515; }
+    .btn-warning { background: #2a1f10; color: #f0ad4e; border: 1px solid #3a2f1f; }
+    .btn-warning:hover { background: #3a2f1f; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+
+    .stat-value { font-family: var(--font-mono); font-size: 32px; font-weight: 500; color: var(--accent); line-height: 1; margin-bottom: 6px; }
+    .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+
+    .toolbar input, .toolbar select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 8px 14px;
+      font-size: 13px;
+      font-family: var(--font-body);
+      outline: none;
+    }
+
+    .toolbar input:focus, .toolbar select:focus { border-color: var(--accent); }
+    .toolbar input { flex: 1; min-width: 200px; }
+
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--surface2); }
+
+    th {
+      padding: 12px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-align: left;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th.date-col { text-align: center; min-width: 100px; }
+
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .student-name { font-weight: 500; color: var(--text); }
+    .student-info { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .att-cell { text-align: center; }
+
+    .att-select {
+      appearance: none;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 5px 10px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      outline: none;
+      width: 88px;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .att-select:focus { border-color: var(--accent); }
+    .att-select.present { background: rgba(76,175,125,0.15); border-color: var(--present); color: var(--present); }
+    .att-select.absent { background: rgba(224,82,82,0.15); border-color: var(--absent); color: var(--absent); }
+    .att-select.alternate { background: rgba(91,155,213,0.15); border-color: var(--alternate); color: var(--alternate); }
+    .att-select.recording { background: rgba(176,127,232,0.15); border-color: var(--recording); color: var(--recording); }
+
+    .summary-cell { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+
+    .badge {
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 500;
+    }
+
+    .badge-present { background: rgba(76,175,125,0.15); color: var(--present); }
+    .badge-absent { background: rgba(224,82,82,0.15); color: var(--absent); }
+    .badge-recording { background: rgba(176,127,232,0.15); color: var(--recording); }
+    .badge-alternate { background: rgba(91,155,213,0.15); color: var(--alternate); }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 200; overflow-y: auto; }
+
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 32px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; margin: auto; }
+
+    .modal-title { font-family: var(--font-display); font-size: 22px; margin-bottom: 20px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+
+    .form-input { width: 100%; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--font-body); outline: none; }
+    .form-input:focus { border-color: var(--accent); }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+    .form-actions { display: flex; gap: 10px; margin-top: 24px; }
+
+    .hidden { display: none !important; }
+
+    .empty { text-align: center; padding: 40px; color: var(--muted); }
+    .empty-icon { font-size: 48px; margin-bottom: 10px; }
+    .empty-text { font-size: 14px; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 13px;
+      z-index: 300;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast.success { border-left: 3px solid var(--present); }
+    @keyframes slideIn { from { transform: translateX(400px); } to { transform: translateX(0); } }
+
+    .actions-cell { display: flex; gap: 6px; }
+
+    .batch-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .batch-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .batch-name { font-family: var(--font-display); font-size: 18px; color: var(--text); }
+    .batch-schedule { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .batch-meta { font-size: 12px; color: var(--accent); margin-top: 8px; }
+
+    @media (max-width: 768px) {
+      .toolbar input { width: 100%; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .main { padding: 16px; }
+      header { padding: 16px; flex-wrap: wrap; }
+      .header-center { flex-direction: column; width: 100%; }
+      .mode-toggle { width: 100%; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Teaching<span>Tracker</span></div>
+  <div class="header-center">
+    <div class="mode-toggle">
+      <button class="mode-btn active" onclick="switchMode('online')">🌐 Online</button>
+      <button class="mode-btn" onclick="switchMode('offline')">📍 Offline</button>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-sm" onclick="openBatchManager()">⚙️ Batches</button>
+    <button class="btn btn-ghost btn-sm" onclick="openAddDate()">📅 Date</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📊 Export</button>
+    <button class="btn btn-ghost btn-sm" onclick="openBulkMessage()">💬 Messages</button>
+  </div>
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="main">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Attendance <em>Tracker</em></div>
+      <div id="mode-label" style="font-size:14px;color:var(--muted);margin-top:4px"></div>
+    </div>
+  </div>
+
+  <div class="stats-row" id="stats"></div>
+
+  <div class="toolbar">
+    <input type="text" id="search" placeholder="Search student..." onkeyup="filterStudents()">
+    <select id="group-filter" onchange="filterStudents()">
+      <option value="">All Groups</option>
+    </select>
+  </div>
+
+  <div id="attendance-view">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Summary</th>
+            <th class="date-col" id="date-headers"></th>
+            <th style="width:120px">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="batch-view" class="hidden">
+    <button class="btn btn-primary" onclick="openAddBatch()">➕ New Batch</button>
+    <div id="batches-container" style="margin-top:20px"></div>
+  </div>
+</div>
+
+<!-- BATCH MANAGER MODAL -->
+<div id="modal-batch-manager" class="modal-overlay hidden" onclick="closeModal('modal-batch-manager')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">Manage Batches & Students</div>
+    <div id="batch-manager-content"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-batch-manager')" style="flex:1">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT BATCH MODAL -->
+<div id="modal-batch" class="modal-overlay hidden" onclick="closeModal('modal-batch')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="batch-modal-title">Add Batch</div>
+    <div class="form-group">
+      <label class="form-label">Batch Name</label>
+      <input type="text" id="batch-name" class="form-input" placeholder="e.g. Grade 3, Grade 4 - Online Batch 1">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Schedule</label>
+      <input type="text" id="batch-schedule" class="form-input" placeholder="e.g. Mon & Wed 7:15–8:15 PM">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes (optional)</label>
+      <input type="text" id="batch-notes" class="form-input" placeholder="e.g. Advanced level, Zoom link in description">
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-batch')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBatch()" style="flex:1">Save Batch</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT STUDENT MODAL -->
+<div id="modal-student" class="modal-overlay hidden" onclick="closeModal('modal-student')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="student-modal-title">Add Student</div>
+    <div class="form-group">
+      <label class="form-label">Student Name</label>
+      <input type="text" id="s-name" class="form-input" placeholder="e.g. Twisha">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Select Batch</label>
+      <select id="s-batch" class="form-input"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Parent Name</label>
+        <input type="text" id="s-parent" class="form-input" placeholder="e.g. Mrs Sharma">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fee per Class (₹)</label>
+        <input type="number" id="s-fee" class="form-input" placeholder="500" value="500">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-student')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStudent()" style="flex:1">Save Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD DATE MODAL -->
+<div id="modal-date" class="modal-overlay hidden" onclick="closeModal('modal-date')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">Add Class Date</div>
+    <div class="form-group">
+      <label class="form-label">Date</label>
+      <input type="date" id="d-date" class="form-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Type</label>
+      <select id="d-type" class="form-input">
+        <option value="class">Regular Class</option>
+        <option value="makeup">Makeup Class</option>
+        <option value="special">Special Session</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-date')">Cancel</button>
+      <button class="btn btn-primary" onclick="addDate()" style="flex:1">Add Date</button>
+    </div>
+  </div>
+</div>
+
+<!-- MESSAGES MODAL -->
+<div id="modal-messages" class="modal-overlay hidden" onclick="closeModal('modal-messages')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:700px">
+    <div class="modal-title">Generate Parent Messages</div>
+    <div class="form-group">
+      <label class="form-label">Select Month</label>
+      <select id="msg-month" class="form-input" onchange="renderMessages()"></select>
+    </div>
+    <div id="messages-list" style="max-height:400px;overflow-y:auto;margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- SINGLE MESSAGE MODAL -->
+<div id="modal-single-msg" class="modal-overlay hidden" onclick="closeModal('modal-single-msg')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:700px">
+    <div class="modal-title" id="single-msg-title"></div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px;font-family:var(--font-mono);font-size:13px;line-height:1.5;white-space:pre-wrap;max-height:400px;overflow-y:auto" id="single-msg-body"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-single-msg')">Close</button>
+      <button class="btn btn-primary" onclick="copyMessage()" style="flex:1">📋 Copy to WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT STUDENT MODAL (from batch manager) -->
+<div id="modal-batch-action" class="modal-overlay hidden" onclick="closeModal('modal-batch-action')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="batch-action-title"></div>
+    <div id="batch-action-content"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-batch-action')" style="flex:1">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let appData = { 
+  online: { batches: [], students: [], classes: {} }, 
+  offline: { batches: [], students: [], classes: {} } 
+};
+let currentMode = 'online';
+let currentTab = 'all';
+let editingBatchId = null;
+let editingStudentId = null;
+
+function currentData() { return appData[currentMode]; }
+
+function loadState() {
+  const saved = localStorage.getItem('teachingTrackerData');
+  if (saved) {
+    appData = JSON.parse(saved);
+  }
+  updateBatchFilter();
+}
+
+function saveState() { 
+  localStorage.setItem('teachingTrackerData', JSON.stringify(appData));
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('mode-label').textContent = mode === 'online' ? '(🌐 Online Batches)' : '(📍 Offline Batches)';
+  currentTab = 'all';
+  renderAll();
+  toast(`Switched to ${mode.toUpperCase()} batches`, 'success');
+}
+
+// BATCH MANAGEMENT
+function openBatchManager() {
+  const data = currentData();
+  const content = `
+    <div style="max-height:400px;overflow-y:auto">
+      <h3 style="font-size:16px;margin-bottom:15px">Batches (${data.batches.length})</h3>
+      ${data.batches.length === 0 ? '<p style="color:var(--muted)">No batches yet. Click "New Batch" in the main view.</p>' : ''}
+      ${data.batches.map(b => `
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div style="flex:1">
+              <div style="font-weight:500;font-size:14px">${b.name}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">${b.schedule}</div>
+              <div style="font-size:12px;color:var(--accent);margin-top:6px">${data.students.filter(s => s.batchId === b.id).length} students</div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-sm" onclick="openEditBatch('${b.id}')">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteBatch('${b.id}')">✕</button>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+      
+      <h3 style="font-size:16px;margin-top:20px;margin-bottom:15px">Students (${data.students.length})</h3>
+      ${data.students.length === 0 ? '<p style="color:var(--muted)">No students yet.</p>' : ''}
+      ${data.students.map(s => {
+        const batch = data.batches.find(b => b.id === s.batchId);
+        return `
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div style="flex:1">
+              <div style="font-weight:500;font-size:14px">${s.name}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">${batch ? batch.name : 'No batch'}</div>
+              <div style="font-size:12px;color:var(--muted)">₹${s.fee}/class ${s.parent ? '• ' + s.parent : ''}</div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-sm" onclick="openEditStudent('${s.id}')">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.id}')">✕</button>
+            </div>
+          </div>
+        </div>
+      `;
+      }).join('')}
+    </div>
+  `;
+  document.getElementById('batch-manager-content').innerHTML = content;
+  document.getElementById('modal-batch-manager').classList.remove('hidden');
+}
+
+function openAddBatch() {
+  editingBatchId = null;
+  document.getElementById('batch-modal-title').textContent = 'Add New Batch';
+  document.getElementById('batch-name').value = '';
+  document.getElementById('batch-schedule').value = '';
+  document.getElementById('batch-notes').value = '';
+  document.getElementById('modal-batch').classList.remove('hidden');
+}
+
+function openEditBatch(batchId) {
+  editingBatchId = batchId;
+  const batch = currentData().batches.find(b => b.id === batchId);
+  if (!batch) return;
+  document.getElementById('batch-modal-title').textContent = 'Edit Batch';
+  document.getElementById('batch-name').value = batch.name;
+  document.getElementById('batch-schedule').value = batch.schedule;
+  document.getElementById('batch-notes').value = batch.notes || '';
+  document.getElementById('modal-batch').classList.remove('hidden');
+}
+
+function saveBatch() {
+  const name = document.getElementById('batch-name').value.trim();
+  const schedule = document.getElementById('batch-schedule').value.trim();
+  if (!name || !schedule) { toast('Please fill required fields'); return; }
+  
+  const data = currentData();
+  if (editingBatchId) {
+    const batch = data.batches.find(b => b.id === editingBatchId);
+    batch.name = name;
+    batch.schedule = schedule;
+    batch.notes = document.getElementById('batch-notes').value.trim();
+    toast('Batch updated!', 'success');
+  } else {
+    data.batches.push({
+      id: Date.now().toString(),
+      name,
+      schedule,
+      notes: document.getElementById('batch-notes').value.trim(),
+      createdAt: new Date().toISOString()
+    });
+    toast('Batch added!', 'success');
+  }
+  saveState();
+  closeModal('modal-batch');
+  renderAll();
+  openBatchManager();
+}
+
+function deleteBatch(batchId) {
+  const data = currentData();
+  const batch = data.batches.find(b => b.id === batchId);
+  const studentCount = data.students.filter(s => s.batchId === batchId).length;
+  
+  if (!confirm(`Delete "${batch.name}"? (${studentCount} students will be removed)`)) return;
+  
+  data.batches = data.batches.filter(b => b.id !== batchId);
+  data.students = data.students.filter(s => s.batchId !== batchId);
+  saveState();
+  toast('Batch deleted', 'success');
+  renderAll();
+  openBatchManager();
+}
+
+// STUDENT MANAGEMENT
+function openAddStudent() {
+  editingStudentId = null;
+  document.getElementById('student-modal-title').textContent = 'Add Student';
+  document.getElementById('s-name').value = '';
+  document.getElementById('s-parent').value = '';
+  document.getElementById('s-fee').value = '500';
+  updateBatchDropdown();
+  document.getElementById('modal-student').classList.remove('hidden');
+}
+
+function openEditStudent(studentId) {
+  editingStudentId = studentId;
+  const student = currentData().students.find(s => s.id === studentId);
+  if (!student) return;
+  document.getElementById('student-modal-title').textContent = 'Edit Student';
+  document.getElementById('s-name').value = student.name;
+  document.getElementById('s-parent').value = student.parent || '';
+  document.getElementById('s-fee').value = student.fee;
+  updateBatchDropdown(student.batchId);
+  document.getElementById('modal-student').classList.remove('hidden');
+}
+
+function saveStudent() {
+  const name = document.getElementById('s-name').value.trim();
+  const batchId = document.getElementById('s-batch').value;
+  if (!name || !batchId) { toast('Please fill required fields'); return; }
+  
+  const data = currentData();
+  const fee = parseInt(document.getElementById('s-fee').value) || 500;
+  
+  if (editingStudentId) {
+    const student = data.students.find(s => s.id === editingStudentId);
+    student.name = name;
+    student.batchId = batchId;
+    student.parent = document.getElementById('s-parent').value.trim();
+    student.fee = fee;
+    toast('Student updated!', 'success');
+  } else {
+    data.students.push({
+      id: Date.now().toString(),
+      name,
+      batchId,
+      parent: document.getElementById('s-parent').value.trim(),
+      fee,
+      createdAt: new Date().toISOString()
+    });
+    toast('Student added!', 'success');
+  }
+  saveState();
+  closeModal('modal-student');
+  renderAll();
+}
+
+function deleteStudent(studentId) {
+  const data = currentData();
+  const student = data.students.find(s => s.id === studentId);
+  if (!confirm(`Delete "${student.name}"?`)) return;
+  
+  data.students = data.students.filter(s => s.id !== studentId);
+  saveState();
+  toast('Student deleted', 'success');
+  renderAll();
+}
+
+function updateBatchDropdown(preselectedId = null) {
+  const data = currentData();
+  const select = document.getElementById('s-batch');
+  select.innerHTML = '<option value="">Select a batch...</option>' + 
+    data.batches.map(b => `<option value="${b.id}" ${b.id === preselectedId ? 'selected' : ''}>${b.name}</option>`).join('');
+}
+
+function updateBatchFilter() {
+  const data = currentData();
+  const select = document.getElementById('group-filter');
+  select.innerHTML = '<option value="">All Batches</option>' + 
+    data.batches.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+}
+
+// ATTENDANCE
+function getAttendance(studentId, date) {
+  return currentData().classes[date] ? currentData().classes[date][studentId] || '' : '';
+}
+
+function setAttendance(studentId, date, value) {
+  const data = currentData();
+  if (!data.classes[date]) data.classes[date] = {};
+  data.classes[date][studentId] = value;
+  saveState();
+}
+
+function getStudentSummary(studentId, dates) {
+  let counted = 0, absent = 0, recording = 0, alternate = 0;
+  dates.forEach(d => {
+    const val = getAttendance(studentId, d.date);
+    if (val === 'present') counted++;
+    else if (val === 'absent') absent++;
+    else if (val === 'recording') { counted++; recording++; }
+    else if (val === 'alternate') { counted++; alternate++; }
+  });
+  return { counted, absent, recording, alternate, total: dates.length };
+}
+
+function getAllDates() {
+  return Object.keys(currentData().classes).sort((a,b) => a.localeCompare(b)).map(d => ({ date: d }));
+}
+
+function renderTabs() {
+  const data = currentData();
+  const tabsHtml = `<button class="tab ${currentTab==='all'?'active':''}" onclick="switchTab('all')">📊 All Students</button>
+    ${data.batches.map(b => `<button class="tab ${currentTab===b.id?'active':''}" onclick="switchTab('${b.id}')">${b.name}</button>`).join('')}`;
+  document.getElementById('tabs').innerHTML = tabsHtml;
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  renderTabs();
+  renderStats();
+  renderTable();
+}
+
+function getDisplayStudents() {
+  const data = currentData();
+  const filter = document.getElementById('group-filter').value;
+  let students = data.students;
+  
+  if (currentTab !== 'all') students = students.filter(s => s.batchId === currentTab);
+  if (filter) students = students.filter(s => s.batchId === filter);
+  
+  return students;
+}
+
+function filterStudents() {
+  renderTable();
+}
+
+function renderStats() {
+  const students = getDisplayStudents();
+  const dates = getAllDates();
+  const totalClasses = dates.length;
+  const totalAttended = students.reduce((sum, s) => {
+    const sum2 = getStudentSummary(s.id, dates);
+    return sum + sum2.counted;
+  }, 0);
+  const avgPercent = students.length && totalClasses ? Math.round((totalAttended / (students.length * totalClasses)) * 100) : 0;
+  
+  const statsHtml = `
+    <div class="stat-card">
+      <div class="stat-value">${students.length}</div>
+      <div class="stat-label">Students</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${totalClasses}</div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${totalAttended}</div>
+      <div class="stat-label">Total Attended</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${avgPercent}%</div>
+      <div class="stat-label">Avg Attendance</div>
+    </div>
+  `;
+  document.getElementById('stats').innerHTML = statsHtml;
+}
+
+function renderTable() {
+  const students = getDisplayStudents();
+  const search = document.getElementById('search').value.toLowerCase();
+  const filtered = students.filter(s => s.name.toLowerCase().includes(search));
+  const dates = getAllDates();
+  const data = currentData();
+
+  let headerHtml = '';
+  dates.forEach(d => {
+    const date = new Date(d.date + 'T00:00:00');
+    const dateStr = date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+    const dayStr = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][date.getDay()];
+    headerHtml += `<th class="date-col" title="${d.date}">${dayStr}<br><small>${dateStr}</small></th>`;
+  });
+  document.getElementById('date-headers').innerHTML = headerHtml;
+
+  if (filtered.length === 0) {
+    document.getElementById('table-body').innerHTML = `<tr><td colspan="20" style="text-align:center"><div class="empty"><div class="empty-icon">👩‍🎓</div><div class="empty-text">No students found. <a onclick="openAddStudent()" style="color:var(--accent);cursor:pointer">Add one →</a></div></div></td></tr>`;
+    return;
+  }
+
+  let bodyHtml = '';
+  filtered.forEach(s => {
+    const batch = data.batches.find(b => b.id === s.batchId);
+    const sum = getStudentSummary(s.id, dates);
+    const pct = dates.length > 0 ? Math.round((sum.counted / dates.length) * 100) : 0;
+    
+    bodyHtml += `<tr>
+      <td>
+        <div class="student-name">${s.name}</div>
+        <div class="student-info">${batch ? batch.name : 'No batch'}${s.parent ? ' · ' + s.parent : ''}</div>
+      </td>
+      <td>
+        <div class="summary-cell">
+          <span class="badge badge-present">${sum.counted} counted</span>
+          ${sum.absent > 0 ? `<span class="badge badge-absent">${sum.absent} absent</span>` : ''}
+          ${sum.recording > 0 ? `<span class="badge badge-recording">${sum.recording} rec</span>` : ''}
+          ${sum.alternate > 0 ? `<span class="badge badge-alternate">${sum.alternate} alt</span>` : ''}
+          <span style="font-size:12px;color:var(--accent);margin-left:8px">${pct}%</span>
+        </div>
+      </td>
+    `;
+
+    dates.forEach(d => {
+      const val = getAttendance(s.id, d.date);
+      bodyHtml += `<td class="att-cell">
+        <select class="att-select ${val}" onchange="handleAttChange(this,'${s.id}','${d.date}')">
+          <option value="" ${!val ? 'selected' : ''}>—</option>
+          <option value="present" ${val==='present' ? 'selected' : ''}>✓</option>
+          <option value="absent" ${val==='absent' ? 'selected' : ''}>✕</option>
+          <option value="recording" ${val==='recording' ? 'selected' : ''}>📹</option>
+          <option value="alternate" ${val==='alternate' ? 'selected' : ''}>🔄</option>
+        </select>
+      </td>`;
+    });
+
+    bodyHtml += `<td>
+      <div class="actions-cell">
+        <button class="btn btn-ghost btn-sm" onclick="openSingleMessage('${s.id}')" title="Message">💬</button>
+        <button class="btn btn-ghost btn-sm" onclick="openEditStudent('${s.id}')" title="Edit">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.id}')" title="Delete">✕</button>
+      </div>
+    </td></tr>`;
+  });
+
+  document.getElementById('table-body').innerHTML = bodyHtml;
+}
+
+function handleAttChange(sel, studentId, dateStr) {
+  setAttendance(studentId, dateStr, sel.value);
+  sel.className = 'att-select ' + sel.value;
+  renderStats();
+  renderTable();
+}
+
+function openAddDate() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('d-date').value = today;
+  document.getElementById('modal-date').classList.remove('hidden');
+}
+
+function addDate() {
+  const date = document.getElementById('d-date').value;
+  if (!date) { toast('Please select a date'); return; }
+  const data = currentData();
+  if (data.classes[date]) { toast('Date already exists'); return; }
+  data.classes[date] = {};
+  saveState();
+  closeModal('modal-date');
+  renderAll();
+  toast('Class date added!', 'success');
+}
+
+function generateMessage(studentId) {
+  const data = currentData();
+  const student = data.students.find(s => s.id === studentId);
+  if (!student) return '';
+  
+  const dates = getAllDates().sort((a,b) => a.date.localeCompare(b.date));
+  const sum = getStudentSummary(studentId, dates);
+  const monthName = dates.length > 0 ? new Date(dates[0].date + 'T00:00:00').toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }) : 'this month';
+  const pct = dates.length > 0 ? Math.round((sum.counted / dates.length) * 100) : 0;
+  const totalFee = sum.counted * student.fee;
+  const batch = data.batches.find(b => b.id === student.batchId);
+
+  let msg = `Dear ${student.parent || 'Parent'},\n\n`;
+  msg += `Here is ${student.name}'s attendance summary for ${monthName}:\n\n`;
+  msg += `📚 Batch: ${batch ? batch.name : 'N/A'}\n`;
+  msg += `✅ Classes held: ${dates.length}\n`;
+  msg += `✅ Classes attended: ${sum.counted}\n`;
+  msg += `❌ Absences: ${sum.absent}\n`;
+  msg += `📹 Recordings sent: ${sum.recording}\n`;
+  msg += `🔄 Alternate classes: ${sum.alternate}\n\n`;
+  msg += `📊 Attendance: ${pct}%\n`;
+  msg += `💰 Total Fee: ₹${totalFee}\n\n`;
+  
+  if (sum.absent === 0) msg += `${student.name} had perfect attendance! 🌟`;
+  else if (pct >= 75) msg += `${student.name} is doing well! 👍`;
+  else msg += `Please encourage ${student.name} to attend regularly.`;
+  
+  msg += `\n\nThank you,\nYour Teacher`;
+  return msg;
+}
+
+function openSingleMessage(studentId) {
+  const student = currentData().students.find(s => s.id === studentId);
+  if (!student) return;
+  const msg = generateMessage(studentId);
+  document.getElementById('single-msg-title').textContent = `Message for ${student.parent || student.name}`;
+  document.getElementById('single-msg-body').textContent = msg;
+  document.getElementById('modal-single-msg').classList.remove('hidden');
+}
+
+function copyMessage() {
+  const text = document.getElementById('single-msg-body').textContent;
+  navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard!', 'success'));
+}
+
+function openBulkMessage() {
+  const dates = getAllDates();
+  if (dates.length === 0) { toast('No class dates added'); return; }
+  
+  const months = [...new Set(dates.map(d => d.date.substring(0, 7)))].sort().reverse();
+  const monthSel = document.getElementById('msg-month');
+  monthSel.innerHTML = months.map(m => {
+    const label = new Date(m + '-01').toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    return `<option value="${m}">${label}</option>`;
+  }).join('');
+  
+  document.getElementById('modal-messages').classList.remove('hidden');
+  renderMessages();
+}
+
+function renderMessages() {
+  const month = document.getElementById('msg-month').value;
+  const students = getDisplayStudents();
+  const dates = getAllDates().filter(d => d.date.startsWith(month));
+  
+  if (dates.length === 0) {
+    document.getElementById('messages-list').innerHTML = '<p style="color:var(--muted)">No data for this month</p>';
+    return;
+  }
+
+  const html = students.map(s => {
+    const sum = getStudentSummary(s.id, dates);
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-weight:500;font-size:14px">${s.name}</div>
+        <div style="font-size:12px;color:var(--muted)">${sum.counted} attended · ${sum.absent} absent</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="openSingleMessage('${s.id}')">View</button>
+    </div>`;
+  }).join('');
+  document.getElementById('messages-list').innerHTML = html;
+}
+
+function exportCSV() {
+  const data = currentData();
+  const dates = getAllDates().sort((a,b) => a.date.localeCompare(b.date));
+  const rows = [['Name', 'Batch', 'Parent', 'Fee', ...dates.map(d => d.date), 'Attended', 'Absent', '%']];
+  
+  data.students.forEach(s => {
+    const batch = data.batches.find(b => b.id === s.batchId);
+    const sum = getStudentSummary(s.id, dates);
+    const pct = dates.length > 0 ? Math.round((sum.counted / dates.length) * 100) : 0;
+    rows.push([
+      s.name, batch ? batch.name : '', s.parent || '', s.fee,
+      ...dates.map(d => getAttendance(s.id, d.date) || '—'),
+      sum.counted, sum.absent, pct + '%'
+    ]);
+  });
+
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `attendance_${currentMode}_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast('CSV exported!', 'success');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.add('hidden');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.add('hidden');
+  });
+});
+
+function toast(msg, type = 'info') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+function renderAll() {
+  renderTabs();
+  renderStats();
+  renderTable();
+  updateBatchFilter();
+}
+
+loadState();
+document.getElementById('mode-label').textContent = '(🌐 Online Batches)';
+renderAll();
+</script>
+
+</body>
+</html>

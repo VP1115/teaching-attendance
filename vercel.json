@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "name": "teaching-attendance",
+  "public": true,
+  "builds": [
+    {
+      "src": "teaching_attendance_complete.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "teaching_attendance_complete.html"
+    }
+  ]
+}
