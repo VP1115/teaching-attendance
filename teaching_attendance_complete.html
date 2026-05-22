@@ -1,40 +1,1343 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TeachingTracker Pro - Attendance Management</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --primary-light: #818cf8;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --dark: #0f172a;
-      --darker: #020617;
-      --surface: #1e293b;
-      --surface-light: #334155;
-      --border: #475569;
-      --text: #f1f5f9;
-      --text-muted: #cbd5e1;
-      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeachingTracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--dark);
-      color: var(--text);
-      overflow-x: hidden;
-    }
+:root {
+  --bg: #0a0a14;
+  --surface: rgba(30, 30, 60, 0.4);
+  --surface-hover: rgba(40, 40, 80, 0.6);
+  --border: rgba(139, 92, 246, 0.15);
+  --border-hover: rgba(139, 92, 246, 0.4);
+  --text: #f1f5f9;
+  --text-dim: #94a3b8;
+  --text-muted: #64748b;
+  --primary: #8b5cf6;
+  --primary-light: #a78bfa;
+  --pink: #ec4899;
+  --blue: #3b82f6;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --recording: #a855f7;
+  --gradient: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+}
 
-    /* HEADER */
-    header {
-      background: linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+}
+
+.header {
+  padding: 24px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 10, 20, 0.7);
+  backdrop-filter: blur(20px);
+}
+
+.logo {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  cursor: pointer;
+}
+
+.mode-switch { display: flex; background: rgba(20, 20, 40, 0.5); border-radius: 10px; padding: 4px; border: 1px solid var(--border); }
+.mode-btn { padding: 8px 16px; background: transparent; border: none; color: var(--text-dim); font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 7px; transition: all 0.2s; font-family: inherit; }
+.mode-btn.active { background: var(--gradient); color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); }
+
+.btn { padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer; border: none; font-family: inherit; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4); }
+.btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface-hover); border-color: var(--border-hover); }
+.btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+.btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+.btn-success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.4); }
+.btn-success:hover { background: rgba(16, 185, 129, 0.25); }
+.btn-sm { padding: 7px 12px; font-size: 12px; }
+.btn-icon { padding: 8px; width: 34px; height: 34px; justify-content: center; }
+
+.container { max-width: 1400px; margin: 0 auto; padding: 32px 40px; }
+
+.page-header { margin-bottom: 28px; }
+.page-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 34px; font-weight: 800; margin-bottom: 6px; letter-spacing: -1px; }
+.page-subtitle { color: var(--text-dim); font-size: 14px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 32px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 22px; backdrop-filter: blur(20px); transition: all 0.3s; }
+.stat-card:hover { transform: translateY(-2px); border-color: var(--border-hover); }
+.stat-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 30px; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 6px; }
+.stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+.empty-state { text-align: center; padding: 80px 20px; }
+.empty-icon { font-size: 72px; margin-bottom: 18px; display: inline-block; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+.empty-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+.empty-text { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
+
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+.section-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 700; }
+
+.batches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+.batch-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 22px; backdrop-filter: blur(20px); cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+.batch-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient); }
+.batch-card:hover { transform: translateY(-4px); border-color: var(--border-hover); background: var(--surface-hover); box-shadow: 0 20px 40px rgba(139, 92, 246, 0.15); }
+.batch-card-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+.batch-card-info { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.batch-info-row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-dim); }
+.batch-info-icon { width: 26px; height: 26px; background: rgba(139, 92, 246, 0.15); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.batch-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--border); }
+.student-count { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+.batch-card-actions { display: flex; gap: 6px; }
+
+.detail-back { display: flex; align-items: center; gap: 6px; color: var(--text-dim); font-size: 13px; cursor: pointer; margin-bottom: 12px; background: none; border: none; font-family: inherit; padding: 6px 10px 6px 0; transition: color 0.2s; }
+.detail-back:hover { color: var(--primary-light); }
+.detail-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+.detail-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 30px; font-weight: 800; margin-bottom: 4px; }
+.detail-meta { color: var(--text-dim); font-size: 14px; }
+.detail-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Month switcher */
+.month-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.month-nav { display: flex; align-items: center; gap: 12px; }
+.month-arrow { background: rgba(139, 92, 246, 0.15); border: 1px solid var(--border); color: var(--text); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.month-arrow:hover { background: rgba(139, 92, 246, 0.3); }
+.month-label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700; min-width: 160px; text-align: center; }
+.month-info { font-size: 12px; color: var(--text-dim); }
+
+/* Table */
+.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px); overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
+th { background: rgba(139, 92, 246, 0.08); padding: 12px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th.center { text-align: center; }
+th.date-col { min-width: 80px; }
+th.today { background: rgba(139, 92, 246, 0.25); color: var(--primary-light); }
+th.cancelled { opacity: 0.4; text-decoration: line-through; }
+td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(139, 92, 246, 0.04); }
+td.center { text-align: center; }
+.student-name { font-weight: 600; }
+.student-parent { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+/* Attendance pill */
+.att-pill { display: inline-flex; align-items: center; justify-content: center; padding: 5px 10px; border-radius: 16px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1.5px solid; background: rgba(100, 116, 139, 0.08); color: var(--text-muted); border-color: rgba(100, 116, 139, 0.25); transition: all 0.15s; min-width: 56px; height: 28px; position: relative; }
+.att-pill:hover { transform: scale(1.08); }
+.att-pill.present { background: rgba(16, 185, 129, 0.15); color: var(--success); border-color: rgba(16, 185, 129, 0.4); }
+.att-pill.absent { background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: rgba(239, 68, 68, 0.4); }
+.att-pill.recording { background: rgba(168, 85, 247, 0.15); color: var(--recording); border-color: rgba(168, 85, 247, 0.4); }
+.att-pill.alternate { background: rgba(59, 130, 246, 0.15); color: var(--blue); border-color: rgba(59, 130, 246, 0.4); }
+.att-pill.cancelled-cell { opacity: 0.3; pointer-events: none; }
+
+.date-col-header { display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
+.date-col-header .date-actions { position: absolute; top: -8px; right: -8px; opacity: 0; transition: opacity 0.2s; }
+th:hover .date-actions { opacity: 1; }
+.date-action-btn { background: rgba(20, 20, 40, 0.9); border: 1px solid var(--border); border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; color: var(--text-dim); display: flex; align-items: center; justify-content: center; }
+.date-action-btn:hover { color: var(--danger); border-color: var(--danger); }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.25s; padding: 20px; }
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal { background: linear-gradient(135deg, rgba(30, 30, 60, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%); border: 1px solid var(--border); border-radius: 22px; padding: 30px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto; backdrop-filter: blur(40px); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5); transform: scale(0.95); transition: transform 0.25s; }
+.modal-overlay.active .modal { transform: scale(1); }
+.modal-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 22px; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.modal-subtitle { color: var(--text-dim); font-size: 13px; margin-top: -16px; margin-bottom: 22px; }
+
+.form-group { margin-bottom: 18px; }
+.form-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.form-input, .form-select { width: 100%; padding: 11px 14px; background: rgba(20, 20, 40, 0.5); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: inherit; font-size: 14px; transition: all 0.2s; }
+.form-input:focus, .form-select:focus { outline: none; border-color: var(--primary); background: rgba(20, 20, 40, 0.8); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.days-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.day-check { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(20, 20, 40, 0.4); border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+.day-check:hover { border-color: var(--border-hover); }
+.day-check.checked { background: rgba(139, 92, 246, 0.15); border-color: var(--primary); }
+.day-check input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+.day-check label { cursor: pointer; font-size: 13px; font-weight: 500; flex: 1; user-select: none; }
+
+.time-picker { display: flex; gap: 8px; align-items: center; }
+.time-input { width: 70px; padding: 11px; background: rgba(20, 20, 40, 0.5); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700; text-align: center; }
+.time-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15); }
+.time-separator { font-size: 20px; font-weight: 700; color: var(--text-dim); }
+.ampm-select { padding: 11px 12px; background: rgba(20, 20, 40, 0.5); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.time-preview { margin-top: 10px; padding: 10px 14px; background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success); border-radius: 8px; font-size: 13px; color: var(--text); display: none; }
+.time-preview.show { display: block; }
+
+.error-msg { padding: 10px 14px; background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--danger); border-radius: 8px; color: var(--danger); font-size: 13px; margin-bottom: 14px; display: none; }
+.error-msg.show { display: block; }
+
+.form-actions { display: flex; gap: 10px; margin-top: 22px; }
+.form-actions .btn { flex: 1; justify-content: center; }
+
+.toast { position: fixed; bottom: 24px; right: 24px; padding: 13px 20px; background: var(--gradient); color: white; border-radius: 12px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4); z-index: 2000; animation: slideInUp 0.3s ease; }
+@keyframes slideInUp { from { transform: translateY(80px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.message-preview { background: rgba(20, 20, 40, 0.5); border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.6; white-space: pre-wrap; max-height: 400px; overflow-y: auto; margin-bottom: 16px; }
+
+/* Attendance picker — when you click a cell */
+.att-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.att-option { padding: 14px; border-radius: 10px; cursor: pointer; border: 1.5px solid var(--border); background: rgba(20, 20, 40, 0.4); transition: all 0.2s; text-align: center; }
+.att-option:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+.att-option .att-emoji { font-size: 24px; margin-bottom: 6px; }
+.att-option .att-name { font-weight: 700; font-size: 14px; }
+.att-option .att-desc { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.att-option.present { border-color: rgba(16, 185, 129, 0.4); }
+.att-option.absent { border-color: rgba(239, 68, 68, 0.4); }
+.att-option.recording { border-color: rgba(168, 85, 247, 0.4); }
+.att-option.alternate { border-color: rgba(59, 130, 246, 0.4); }
+.att-option.clear { grid-column: 1 / -1; padding: 10px; }
+
+@media (max-width: 768px) {
+  .header { padding: 16px 20px; flex-wrap: wrap; gap: 12px; }
+  .container { padding: 20px; }
+  .page-title { font-size: 26px; }
+  .detail-title { font-size: 24px; }
+  .form-row { grid-template-columns: 1fr; }
+  .days-grid { grid-template-columns: 1fr; }
+  .batches-grid { grid-template-columns: 1fr; }
+  .modal { padding: 22px; }
+  .att-picker { grid-template-columns: 1fr; }
+}
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo" onclick="goHome()">✨ TeachingTracker</div>
+  <div class="mode-switch">
+    <button class="mode-btn active" data-mode="online" onclick="switchMode('online')">🌐 Online</button>
+    <button class="mode-btn" data-mode="offline" onclick="switchMode('offline')">📍 Offline</button>
+  </div>
+</div>
+
+<div class="container">
+  <div id="view-home">
+    <div class="page-header">
+      <h1 class="page-title">Attendance Tracker</h1>
+      <p class="page-subtitle">Auto-scheduled classes · Smart attendance · Parent messages with fees</p>
+    </div>
+    <div class="stats-grid" id="stats"></div>
+    <div id="batches-section"></div>
+  </div>
+
+  <div id="view-detail" class="hidden">
+    <button class="detail-back" onclick="goHome()">← Back to all batches</button>
+    <div class="detail-header">
+      <div>
+        <h1 class="detail-title" id="detail-title"></h1>
+        <p class="detail-meta" id="detail-meta"></p>
+      </div>
+      <div class="detail-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openEditBatchModal()">⚙️ Edit Batch</button>
+        <button class="btn btn-ghost btn-sm" onclick="openExtraClassModal()">➕ Extra Class</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📊 Export</button>
+        <button class="btn btn-primary btn-sm" onclick="openStudentModal()">+ Add Student</button>
+      </div>
+    </div>
+
+    <div class="month-bar">
+      <div class="month-nav">
+        <button class="month-arrow" onclick="changeMonth(-1)">←</button>
+        <div class="month-label" id="month-label"></div>
+        <button class="month-arrow" onclick="changeMonth(1)">→</button>
+      </div>
+      <div class="month-info" id="month-info"></div>
+      <button class="btn btn-success btn-sm" onclick="markAllPresent()">✓ Mark All Present</button>
+    </div>
+
+    <div class="stats-grid" id="detail-stats"></div>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<!-- BATCH MODAL -->
+<div class="modal-overlay" id="modal-batch">
+  <div class="modal">
+    <div class="modal-title" id="batch-modal-title">Create New Batch</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Grade</label>
+        <select class="form-select" id="f-grade">
+          <option value="">Select...</option>
+          <option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option>
+          <option value="4">Grade 4</option><option value="5">Grade 5</option><option value="6">Grade 6</option>
+          <option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option>
+          <option value="10">Grade 10</option><option value="11">Grade 11</option><option value="12">Grade 12</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Batch</label>
+        <select class="form-select" id="f-batchtype">
+          <option value="">Select...</option>
+          <option value="Batch 1">Batch 1</option><option value="Batch 2">Batch 2</option>
+          <option value="Batch 3">Batch 3</option><option value="Batch 4">Batch 4</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Days of the Week (recurring)</label>
+      <div class="days-grid" id="days-grid">
+        <div class="day-check" onclick="toggleDay(this, 'Monday')"><input type="checkbox"><label>Monday</label></div>
+        <div class="day-check" onclick="toggleDay(this, 'Tuesday')"><input type="checkbox"><label>Tuesday</label></div>
+        <div class="day-check" onclick="toggleDay(this, 'Wednesday')"><input type="checkbox"><label>Wednesday</label></div>
+        <div class="day-check" onclick="toggleDay(this, 'Thursday')"><input type="checkbox"><label>Thursday</label></div>
+        <div class="day-check" onclick="toggleDay(this, 'Friday')"><input type="checkbox"><label>Friday</label></div>
+        <div class="day-check" onclick="toggleDay(this, 'Saturday')"><input type="checkbox"><label>Saturday</label></div>
+        <div class="day-check" onclick="toggleDay(this, 'Sunday')"><input type="checkbox"><label>Sunday</label></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Class Time</label>
+      <div class="time-picker">
+        <input type="text" inputmode="numeric" maxlength="2" class="time-input" id="f-hours" placeholder="7" oninput="updateTimePreview()">
+        <span class="time-separator">:</span>
+        <input type="text" inputmode="numeric" maxlength="2" class="time-input" id="f-minutes" placeholder="15" oninput="updateTimePreview()">
+        <select class="ampm-select" id="f-ampm" onchange="updateTimePreview()">
+          <option value="AM">AM</option><option value="PM" selected>PM</option>
+        </select>
+      </div>
+      <div class="time-preview" id="time-preview"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Duration</label>
+      <select class="form-select" id="f-duration">
+        <option value="">Select...</option>
+        <option value="30">30 minutes</option><option value="45">45 minutes</option>
+        <option value="60">1 hour</option><option value="75">1 hour 15 minutes</option>
+        <option value="90">1 hour 30 minutes</option><option value="120">2 hours</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes (Optional)</label>
+      <input type="text" class="form-input" id="f-notes" placeholder="e.g., Advanced batch, Zoom link...">
+    </div>
+    <div class="error-msg" id="batch-error"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-batch')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBatch()" id="save-batch-btn">Create Batch</button>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT MODAL -->
+<div class="modal-overlay" id="modal-student">
+  <div class="modal">
+    <div class="modal-title" id="student-modal-title">Add Student</div>
+    <div class="form-group">
+      <label class="form-label">Student Name *</label>
+      <input type="text" class="form-input" id="s-name" placeholder="e.g., Twisha Sharma">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Parent Name</label>
+        <input type="text" class="form-input" id="s-parent" placeholder="e.g., Mrs Sharma">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input type="tel" class="form-input" id="s-phone" placeholder="e.g., 9876543210">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Fee per Class (₹) *</label>
+      <input type="number" class="form-input" id="s-fee" value="500" min="0">
+    </div>
+    <div class="error-msg" id="student-error"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-student')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStudent()" id="save-student-btn">Add Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXTRA CLASS MODAL -->
+<div class="modal-overlay" id="modal-extra">
+  <div class="modal" style="max-width: 420px;">
+    <div class="modal-title">Add Extra Class</div>
+    <p class="modal-subtitle">For a makeup or one-off class outside the regular schedule.</p>
+    <div class="form-group">
+      <label class="form-label">Date</label>
+      <input type="date" class="form-input" id="f-extra-date">
+    </div>
+    <div class="error-msg" id="extra-error"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-extra')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveExtraClass()">Add Class</button>
+    </div>
+  </div>
+</div>
+
+<!-- ATTENDANCE PICKER MODAL -->
+<div class="modal-overlay" id="modal-att">
+  <div class="modal" style="max-width: 460px;">
+    <div class="modal-title" id="att-modal-title">Mark Attendance</div>
+    <p class="modal-subtitle" id="att-modal-subtitle"></p>
+    <div class="att-picker">
+      <div class="att-option present" onclick="setAttendance('present')">
+        <div class="att-emoji">✓</div>
+        <div class="att-name">Present</div>
+        <div class="att-desc">Attended live</div>
+      </div>
+      <div class="att-option absent" onclick="setAttendance('absent')">
+        <div class="att-emoji">✕</div>
+        <div class="att-name">Absent</div>
+        <div class="att-desc">Did not attend</div>
+      </div>
+      <div class="att-option recording" onclick="setAttendance('recording')">
+        <div class="att-emoji">📹</div>
+        <div class="att-name">Recording</div>
+        <div class="att-desc">Watched recording</div>
+      </div>
+      <div class="att-option alternate" onclick="askAlternate()">
+        <div class="att-emoji">↔</div>
+        <div class="att-name">Alternate</div>
+        <div class="att-desc">Attended other class</div>
+      </div>
+      <div class="att-option clear" onclick="setAttendance(null)">
+        <div class="att-name" style="color: var(--text-dim)">Clear / Not marked</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ALTERNATE DATE MODAL -->
+<div class="modal-overlay" id="modal-alt">
+  <div class="modal" style="max-width: 460px;">
+    <div class="modal-title">Alternate Class</div>
+    <p class="modal-subtitle" id="alt-subtitle"></p>
+    <div class="form-group">
+      <label class="form-label">Which date did they attend instead? *</label>
+      <input type="date" class="form-input" id="f-alt-date">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Note (optional)</label>
+      <input type="text" class="form-input" id="f-alt-note" placeholder="e.g., Joined Wed batch this week">
+    </div>
+    <div class="error-msg" id="alt-error"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-alt')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAlternate()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- MESSAGE MODAL -->
+<div class="modal-overlay" id="modal-message">
+  <div class="modal" style="max-width: 600px;">
+    <div class="modal-title" id="message-modal-title">Parent Message</div>
+    <div class="message-preview" id="message-preview"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-message')">Close</button>
+      <button class="btn btn-primary" onclick="copyMessage()">📋 Copy Message</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// STATE & PERSISTENCE
+// ============================================
+let state = {
+  online: { batches: [], students: [], attendance: {}, cancelled: {} },
+  offline: { batches: [], students: [], attendance: {}, cancelled: {} }
+};
+let currentMode = 'online';
+let currentView = 'home';
+let currentBatchId = null;
+let currentMonth = new Date(); // first day of current viewed month
+let editingBatchId = null;
+let editingStudentId = null;
+let selectedDays = [];
+let attendanceContext = null; // {batchId, date, studentId}
+
+function load() {
+  try {
+    const saved = localStorage.getItem('tt_state_v6');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+      // Ensure cancelled exists
+      ['online', 'offline'].forEach(m => {
+        if (!state[m].cancelled) state[m].cancelled = {};
+      });
+    }
+  } catch (e) { console.error('Load failed', e); }
+}
+
+function save() {
+  try { localStorage.setItem('tt_state_v6', JSON.stringify(state)); }
+  catch (e) { console.error('Save failed', e); }
+}
+
+function data() { return state[currentMode]; }
+
+// ============================================
+// MODE
+// ============================================
+function switchMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  goHome();
+  toast(`Switched to ${mode.toUpperCase()}`);
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+function goHome() {
+  currentView = 'home';
+  currentBatchId = null;
+  document.getElementById('view-home').classList.remove('hidden');
+  document.getElementById('view-detail').classList.add('hidden');
+  renderHome();
+}
+
+function goToBatch(batchId) {
+  currentBatchId = batchId;
+  currentView = 'detail';
+  currentMonth = new Date();
+  currentMonth.setDate(1);
+  document.getElementById('view-home').classList.add('hidden');
+  document.getElementById('view-detail').classList.remove('hidden');
+  renderDetail();
+}
+
+// ============================================
+// DATE UTILITIES
+// ============================================
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+function generateMonthDates(year, month, dayNames) {
+  // Generate all dates in the given month that fall on the specified days of week
+  const dates = [];
+  const dayIndexes = dayNames.map(d => DAY_NAMES.indexOf(d));
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  for (let d = 1; d <= lastDay; d++) {
+    const date = new Date(year, month, d);
+    if (dayIndexes.includes(date.getDay())) {
+      dates.push(formatDateKey(date));
+    }
+  }
+  return dates;
+}
+
+function formatDateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function isToday(dateStr) {
+  return dateStr === formatDateKey(new Date());
+}
+
+function changeMonth(delta) {
+  currentMonth.setMonth(currentMonth.getMonth() + delta);
+  renderDetail();
+}
+
+// ============================================
+// RENDER: HOME
+// ============================================
+function renderHome() {
+  const d = data();
+  let totalAttended = 0, totalPossible = 0;
+  Object.values(d.attendance).forEach(day => {
+    Object.values(day).forEach(rec => {
+      totalPossible++;
+      if (rec.status === 'present' || rec.status === 'recording' || rec.status === 'alternate') totalAttended++;
+    });
+  });
+  const avgPct = totalPossible ? Math.round((totalAttended / totalPossible) * 100) : 0;
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${d.batches.length}</div><div class="stat-label">Batches</div></div>
+    <div class="stat-card"><div class="stat-value">${d.students.length}</div><div class="stat-label">Students</div></div>
+    <div class="stat-card"><div class="stat-value">${totalAttended}</div><div class="stat-label">Total Attended</div></div>
+    <div class="stat-card"><div class="stat-value">${avgPct}%</div><div class="stat-label">Avg Attendance</div></div>
+  `;
+
+  const section = document.getElementById('batches-section');
+  if (d.batches.length === 0) {
+    section.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        <div class="empty-title">No batches yet</div>
+        <div class="empty-text">Create your first batch to start tracking attendance</div>
+        <button class="btn btn-primary" onclick="openAddBatchModal()">+ Create First Batch</button>
+      </div>`;
+    return;
+  }
+
+  section.innerHTML = `
+    <div class="section-header">
+      <h2 class="section-title">Your Batches</h2>
+      <button class="btn btn-primary btn-sm" onclick="openAddBatchModal()">+ New Batch</button>
+    </div>
+    <div class="batches-grid">
+      ${d.batches.map(b => batchCardHTML(b)).join('')}
+    </div>`;
+}
+
+function batchCardHTML(b) {
+  const count = data().students.filter(s => s.batchId === b.id).length;
+  const time = formatTime(b.time, b.ampm);
+  const dur = formatDuration(b.duration);
+  const daysStr = b.days.map(d => d.slice(0, 3)).join(', ');
+  return `
+    <div class="batch-card" onclick="goToBatch('${b.id}')">
+      <div class="batch-card-title">Grade ${b.grade} · ${b.batchType}</div>
+      <div class="batch-card-info">
+        <div class="batch-info-row"><div class="batch-info-icon">📅</div><div>${daysStr}</div></div>
+        <div class="batch-info-row"><div class="batch-info-icon">⏰</div><div>${time} · ${dur}</div></div>
+        ${b.notes ? `<div class="batch-info-row"><div class="batch-info-icon">📝</div><div>${escapeHtml(b.notes)}</div></div>` : ''}
+      </div>
+      <div class="batch-card-footer">
+        <div class="student-count">👥 ${count} student${count !== 1 ? 's' : ''}</div>
+        <div class="batch-card-actions">
+          <button class="btn btn-ghost btn-icon" onclick="event.stopPropagation(); openEditBatchModalById('${b.id}')" title="Edit">✏️</button>
+          <button class="btn btn-danger btn-icon" onclick="event.stopPropagation(); deleteBatch('${b.id}')" title="Delete">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ============================================
+// RENDER: DETAIL (THE BIG ONE)
+// ============================================
+function renderDetail() {
+  const d = data();
+  const batch = d.batches.find(b => b.id === currentBatchId);
+  if (!batch) { goHome(); return; }
+
+  document.getElementById('detail-title').textContent = `Grade ${batch.grade} · ${batch.batchType}`;
+  const time = formatTime(batch.time, batch.ampm);
+  document.getElementById('detail-meta').textContent = `${batch.days.join(', ')} · ${time} · ${formatDuration(batch.duration)}`;
+
+  // Month label
+  const monthLabel = currentMonth.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+  document.getElementById('month-label').textContent = monthLabel;
+
+  // Generate dates for THIS month from schedule
+  const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days);
+
+  // Also include any extra classes added for this batch+month
+  const monthPrefix = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+  const extras = Object.keys(d.attendance)
+    .filter(k => k.startsWith(batch.id + '_') && k.includes(monthPrefix))
+    .map(k => k.substring(batch.id.length + 1))
+    .filter(date => !scheduled.includes(date));
+
+  const allDates = [...scheduled, ...extras].sort();
+
+  // Filter out cancelled dates from "active" for stats
+  const activeDates = allDates.filter(date => !isCancelled(batch.id, date));
+
+  const students = d.students.filter(s => s.batchId === batch.id);
+
+  // Stats
+  let totalAttended = 0, totalPossible = 0, totalFee = 0;
+  students.forEach(s => {
+    activeDates.forEach(date => {
+      const rec = getAttendance(batch.id, date, s.id);
+      if (rec) totalPossible++;
+      if (rec && ['present', 'recording', 'alternate'].includes(rec.status)) {
+        totalAttended++;
+        totalFee += (s.fee || 0);
+      }
+    });
+  });
+  const pct = totalPossible ? Math.round((totalAttended / totalPossible) * 100) : 0;
+
+  document.getElementById('month-info').innerHTML = `${activeDates.length} class${activeDates.length !== 1 ? 'es' : ''} this month · ${students.length} student${students.length !== 1 ? 's' : ''}`;
+
+  document.getElementById('detail-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${students.length}</div><div class="stat-label">Students</div></div>
+    <div class="stat-card"><div class="stat-value">${activeDates.length}</div><div class="stat-label">Classes</div></div>
+    <div class="stat-card"><div class="stat-value">${totalAttended}</div><div class="stat-label">Total Attended</div></div>
+    <div class="stat-card"><div class="stat-value">₹${totalFee}</div><div class="stat-label">Total Fees</div></div>
+    <div class="stat-card"><div class="stat-value">${pct}%</div><div class="stat-label">Avg Rate</div></div>
+  `;
+
+  const content = document.getElementById('detail-content');
+  if (students.length === 0) {
+    content.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <div class="empty-title">No students in this batch</div>
+        <div class="empty-text">Add students to start tracking their attendance</div>
+        <button class="btn btn-primary" onclick="openStudentModal()">+ Add First Student</button>
+      </div>`;
+    return;
+  }
+
+  if (allDates.length === 0) {
+    content.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <div class="empty-title">No classes scheduled in ${monthLabel}</div>
+        <div class="empty-text">This batch runs on ${batch.days.join(', ')} — those days don't fall in this month, or you can add an extra class.</div>
+        <button class="btn btn-primary" onclick="openExtraClassModal()">+ Add Extra Class</button>
+      </div>`;
+    return;
+  }
+
+  // Build attendance table
+  let html = `<div class="table-wrap"><table>`;
+  html += `<thead><tr><th>Student</th><th class="center">Stats</th>`;
+  allDates.forEach(date => {
+    const dObj = new Date(date + 'T00:00:00');
+    const day = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dObj.getDay()];
+    const dStr = dObj.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+    const cancelled = isCancelled(batch.id, date);
+    const todayClass = isToday(date) ? 'today' : '';
+    const cancelClass = cancelled ? 'cancelled' : '';
+    const isExtra = !scheduled.includes(date);
+    html += `<th class="center date-col ${todayClass} ${cancelClass}">
+      <div class="date-col-header">
+        <span>${day}${isExtra ? ' ✨' : ''}</span>
+        <span style="font-weight:400;font-size:10px">${dStr}</span>
+        <div class="date-actions">
+          <button class="date-action-btn" onclick="toggleCancelDate('${batch.id}','${date}')" title="${cancelled ? 'Restore' : 'Cancel'} this class">${cancelled ? '↺' : '✕'}</button>
+        </div>
+      </div>
+    </th>`;
+  });
+  html += `<th class="center">Actions</th></tr></thead><tbody>`;
+
+  students.forEach(s => {
+    let attended = 0, possible = 0;
+    activeDates.forEach(date => {
+      const rec = getAttendance(batch.id, date, s.id);
+      if (rec) possible++;
+      if (rec && ['present', 'recording', 'alternate'].includes(rec.status)) attended++;
+    });
+    const fee = attended * (s.fee || 0);
+
+    html += `<tr>
+      <td>
+        <div class="student-name">${escapeHtml(s.name)}</div>
+        ${s.parent ? `<div class="student-parent">${escapeHtml(s.parent)}</div>` : ''}
+      </td>
+      <td class="center">
+        <div style="font-weight:700;color:var(--success)">${attended}/${activeDates.length}</div>
+        <div style="font-size:11px;color:var(--text-dim)">₹${fee}</div>
+      </td>`;
+
+    allDates.forEach(date => {
+      const cancelled = isCancelled(batch.id, date);
+      const rec = getAttendance(batch.id, date, s.id);
+      const status = rec ? rec.status : '';
+      const label = status === 'present' ? '✓' : status === 'absent' ? '✕' :
+                    status === 'recording' ? '📹' : status === 'alternate' ? '↔' : '—';
+      const tooltip = rec && rec.alternateDate ? ` title="Attended ${formatDateNice(rec.alternateDate)}${rec.note ? ' — ' + rec.note : ''}"` : '';
+      html += `<td class="center"><button class="att-pill ${status} ${cancelled ? 'cancelled-cell' : ''}" onclick="openAttModal('${batch.id}','${date}','${s.id}')"${tooltip}>${label}</button></td>`;
+    });
+
+    html += `<td class="center" style="white-space:nowrap">
+      <button class="btn btn-ghost btn-icon" onclick="openMessageModal('${s.id}')" title="Message">💬</button>
+      <button class="btn btn-ghost btn-icon" onclick="openEditStudentModal('${s.id}')" title="Edit">✏️</button>
+      <button class="btn btn-danger btn-icon" onclick="deleteStudent('${s.id}')" title="Delete">🗑️</button>
+    </td></tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  content.innerHTML = html;
+}
+
+// ============================================
+// ATTENDANCE
+// ============================================
+function getAttendance(batchId, date, studentId) {
+  const key = `${batchId}_${date}`;
+  const day = data().attendance[key];
+  return day ? day[studentId] || null : null;
+}
+
+function openAttModal(batchId, date, studentId) {
+  if (isCancelled(batchId, date)) {
+    toast('This class is cancelled. Restore it first.');
+    return;
+  }
+  attendanceContext = { batchId, date, studentId };
+  const student = data().students.find(s => s.id === studentId);
+  const dStr = formatDateNice(date);
+  document.getElementById('att-modal-title').textContent = `Mark ${student.name}`;
+  document.getElementById('att-modal-subtitle').textContent = `for ${dStr}`;
+  openModal('modal-att');
+}
+
+function setAttendance(status) {
+  if (!attendanceContext) return;
+  const { batchId, date, studentId } = attendanceContext;
+  const key = `${batchId}_${date}`;
+  if (!data().attendance[key]) data().attendance[key] = {};
+
+  if (status === null) {
+    delete data().attendance[key][studentId];
+  } else {
+    data().attendance[key][studentId] = { status };
+  }
+  save();
+  closeModal('modal-att');
+  renderDetail();
+}
+
+function askAlternate() {
+  // Pre-fill with the same date as default
+  document.getElementById('f-alt-date').value = attendanceContext.date;
+  document.getElementById('f-alt-note').value = '';
+  document.getElementById('alt-error').classList.remove('show');
+  const student = data().students.find(s => s.id === attendanceContext.studentId);
+  document.getElementById('alt-subtitle').textContent = `${student.name} was supposed to attend on ${formatDateNice(attendanceContext.date)}. When did they attend instead?`;
+  closeModal('modal-att');
+  openModal('modal-alt');
+}
+
+function saveAlternate() {
+  const altDate = document.getElementById('f-alt-date').value;
+  const note = document.getElementById('f-alt-note').value.trim();
+  const errEl = document.getElementById('alt-error');
+
+  if (!altDate) {
+    errEl.textContent = 'Please select the alternate date';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const { batchId, date, studentId } = attendanceContext;
+  const key = `${batchId}_${date}`;
+  if (!data().attendance[key]) data().attendance[key] = {};
+  data().attendance[key][studentId] = {
+    status: 'alternate',
+    alternateDate: altDate,
+    note
+  };
+  save();
+  closeModal('modal-alt');
+  renderDetail();
+  toast('Alternate class recorded');
+}
+
+function markAllPresent() {
+  const batch = data().batches.find(b => b.id === currentBatchId);
+  const students = data().students.filter(s => s.batchId === batch.id);
+  const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days);
+  const monthPrefix = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+  const extras = Object.keys(data().attendance)
+    .filter(k => k.startsWith(batch.id + '_') && k.includes(monthPrefix))
+    .map(k => k.substring(batch.id.length + 1))
+    .filter(date => !scheduled.includes(date));
+  const allDates = [...scheduled, ...extras];
+
+  if (students.length === 0 || allDates.length === 0) {
+    toast('Nothing to mark');
+    return;
+  }
+  if (!confirm(`Mark all ${students.length} students present for all ${allDates.length} classes this month?\n\n(This will only fill empty cells — existing marks stay.)`)) return;
+
+  let count = 0;
+  allDates.forEach(date => {
+    if (isCancelled(batch.id, date)) return;
+    const key = `${batch.id}_${date}`;
+    if (!data().attendance[key]) data().attendance[key] = {};
+    students.forEach(s => {
+      if (!data().attendance[key][s.id]) {
+        data().attendance[key][s.id] = { status: 'present' };
+        count++;
+      }
+    });
+  });
+  save();
+  renderDetail();
+  toast(`Marked ${count} cells present`);
+}
+
+// ============================================
+// CANCEL CLASS
+// ============================================
+function isCancelled(batchId, date) {
+  return data().cancelled[`${batchId}_${date}`] === true;
+}
+
+function toggleCancelDate(batchId, date) {
+  const key = `${batchId}_${date}`;
+  if (data().cancelled[key]) {
+    delete data().cancelled[key];
+    toast('Class restored');
+  } else {
+    data().cancelled[key] = true;
+    toast('Class cancelled');
+  }
+  save();
+  renderDetail();
+}
+
+// ============================================
+// EXTRA CLASS (makeup / one-off)
+// ============================================
+function openExtraClassModal() {
+  // Default to today
+  document.getElementById('f-extra-date').value = formatDateKey(new Date());
+  document.getElementById('extra-error').classList.remove('show');
+  openModal('modal-extra');
+}
+
+function saveExtraClass() {
+  const date = document.getElementById('f-extra-date').value;
+  const errEl = document.getElementById('extra-error');
+  if (!date) {
+    errEl.textContent = 'Please pick a date';
+    errEl.classList.add('show');
+    return;
+  }
+  const key = `${currentBatchId}_${date}`;
+  if (data().attendance[key]) {
+    errEl.textContent = 'A class already exists on that date';
+    errEl.classList.add('show');
+    return;
+  }
+  data().attendance[key] = {};
+  save();
+
+  // Jump to that date's month
+  const dObj = new Date(date + 'T00:00:00');
+  currentMonth = new Date(dObj.getFullYear(), dObj.getMonth(), 1);
+
+  closeModal('modal-extra');
+  renderDetail();
+  toast('Extra class added');
+}
+
+// ============================================
+// BATCH CRUD
+// ============================================
+function openAddBatchModal() {
+  editingBatchId = null;
+  selectedDays = [];
+  document.getElementById('batch-modal-title').textContent = 'Create New Batch';
+  document.getElementById('save-batch-btn').textContent = 'Create Batch';
+  ['f-grade','f-batchtype','f-hours','f-minutes','f-duration','f-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-ampm').value = 'PM';
+  document.querySelectorAll('#days-grid .day-check').forEach(d => {
+    d.classList.remove('checked');
+    d.querySelector('input').checked = false;
+  });
+  document.getElementById('batch-error').classList.remove('show');
+  document.getElementById('time-preview').classList.remove('show');
+  openModal('modal-batch');
+}
+
+function openEditBatchModal() { openEditBatchModalById(currentBatchId); }
+
+function openEditBatchModalById(batchId) {
+  const b = data().batches.find(x => x.id === batchId);
+  if (!b) return;
+  editingBatchId = batchId;
+  selectedDays = [...b.days];
+
+  document.getElementById('batch-modal-title').textContent = 'Edit Batch';
+  document.getElementById('save-batch-btn').textContent = 'Save Changes';
+  document.getElementById('f-grade').value = b.grade;
+  document.getElementById('f-batchtype').value = b.batchType;
+  document.getElementById('f-hours').value = b.time.split(':')[0];
+  document.getElementById('f-minutes').value = b.time.split(':')[1];
+  document.getElementById('f-ampm').value = b.ampm;
+  document.getElementById('f-duration').value = b.duration;
+  document.getElementById('f-notes').value = b.notes || '';
+  document.getElementById('batch-error').classList.remove('show');
+
+  document.querySelectorAll('#days-grid .day-check').forEach(d => {
+    const label = d.querySelector('label').textContent;
+    const checked = b.days.includes(label);
+    d.classList.toggle('checked', checked);
+    d.querySelector('input').checked = checked;
+  });
+
+  updateTimePreview();
+  openModal('modal-batch');
+}
+
+function toggleDay(el, day) {
+  const cb = el.querySelector('input');
+  cb.checked = !cb.checked;
+  el.classList.toggle('checked', cb.checked);
+  if (cb.checked) {
+    if (!selectedDays.includes(day)) selectedDays.push(day);
+  } else {
+    selectedDays = selectedDays.filter(d => d !== day);
+  }
+}
+
+function updateTimePreview() {
+  const h = document.getElementById('f-hours').value;
+  const m = document.getElementById('f-minutes').value;
+  const ap = document.getElementById('f-ampm').value;
+  const preview = document.getElementById('time-preview');
+  if (h && m) {
+    const hh = parseInt(h);
+    const mm = parseInt(m);
+    if (hh >= 1 && hh <= 12 && mm >= 0 && mm <= 59) {
+      preview.textContent = `Class starts at ${hh}:${String(mm).padStart(2, '0')} ${ap}`;
+      preview.classList.add('show');
+      return;
+    }
+  }
+  preview.classList.remove('show');
+}
+
+function saveBatch() {
+  const grade = document.getElementById('f-grade').value;
+  const batchType = document.getElementById('f-batchtype').value;
+  const hours = document.getElementById('f-hours').value;
+  const minutes = document.getElementById('f-minutes').value;
+  const ampm = document.getElementById('f-ampm').value;
+  const duration = document.getElementById('f-duration').value;
+  const notes = document.getElementById('f-notes').value.trim();
+
+  const errEl = document.getElementById('batch-error');
+  if (!grade || !batchType || selectedDays.length === 0 || !hours || !minutes || !duration) {
+    errEl.textContent = 'Please fill all required fields (Grade, Batch, Days, Time, Duration)';
+    errEl.classList.add('show');
+    return;
+  }
+  const hh = parseInt(hours), mm = parseInt(minutes);
+  if (isNaN(hh) || hh < 1 || hh > 12 || isNaN(mm) || mm < 0 || mm > 59) {
+    errEl.textContent = 'Please enter a valid time (Hours 1-12, Minutes 0-59)';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const timeStr = `${hh}:${String(mm).padStart(2, '0')}`;
+  const d = data();
+
+  if (editingBatchId) {
+    const b = d.batches.find(x => x.id === editingBatchId);
+    b.grade = grade; b.batchType = batchType; b.days = [...selectedDays];
+    b.time = timeStr; b.ampm = ampm; b.duration = duration; b.notes = notes;
+    toast('Batch updated');
+  } else {
+    d.batches.push({
+      id: Date.now().toString(),
+      grade, batchType, days: [...selectedDays],
+      time: timeStr, ampm, duration, notes,
+      createdAt: new Date().toISOString()
+    });
+    toast('Batch created');
+  }
+  save();
+  closeModal('modal-batch');
+  if (currentView === 'detail') renderDetail(); else renderHome();
+}
+
+function deleteBatch(batchId) {
+  const b = data().batches.find(x => x.id === batchId);
+  if (!b) return;
+  const studentCount = data().students.filter(s => s.batchId === batchId).length;
+  if (!confirm(`Delete "Grade ${b.grade} ${b.batchType}"?\n\nThis removes ${studentCount} student(s) and all attendance records.`)) return;
+
+  const d = data();
+  d.batches = d.batches.filter(x => x.id !== batchId);
+  d.students = d.students.filter(s => s.batchId !== batchId);
+  Object.keys(d.attendance).forEach(k => { if (k.startsWith(batchId + '_')) delete d.attendance[k]; });
+  Object.keys(d.cancelled).forEach(k => { if (k.startsWith(batchId + '_')) delete d.cancelled[k]; });
+  save();
+  if (currentBatchId === batchId) goHome(); else renderHome();
+  toast('Batch deleted');
+}
+
+// ============================================
+// STUDENT CRUD
+// ============================================
+function openStudentModal() {
+  editingStudentId = null;
+  document.getElementById('student-modal-title').textContent = 'Add Student';
+  document.getElementById('save-student-btn').textContent = 'Add Student';
+  document.getElementById('s-name').value = '';
+  document.getElementById('s-parent').value = '';
+  document.getElementById('s-phone').value = '';
+  document.getElementById('s-fee').value = '500';
+  document.getElementById('student-error').classList.remove('show');
+  openModal('modal-student');
+}
+
+function openEditStudentModal(studentId) {
+  const s = data().students.find(x => x.id === studentId);
+  if (!s) return;
+  editingStudentId = studentId;
+  document.getElementById('student-modal-title').textContent = 'Edit Student';
+  document.getElementById('save-student-btn').textContent = 'Save Changes';
+  document.getElementById('s-name').value = s.name;
+  document.getElementById('s-parent').value = s.parent || '';
+  document.getElementById('s-phone').value = s.phone || '';
+  document.getElementById('s-fee').value = s.fee;
+  document.getElementById('student-error').classList.remove('show');
+  openModal('modal-student');
+}
+
+function saveStudent() {
+  const name = document.getElementById('s-name').value.trim();
+  const parent = document.getElementById('s-parent').value.trim();
+  const phone = document.getElementById('s-phone').value.trim();
+  const fee = parseInt(document.getElementById('s-fee').value) || 0;
+  const errEl = document.getElementById('student-error');
+
+  if (!name) {
+    errEl.textContent = 'Please enter student name';
+    errEl.classList.add('show');
+    return;
+  }
+  if (fee < 0) {
+    errEl.textContent = 'Fee must be 0 or more';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const d = data();
+  if (editingStudentId) {
+    const s = d.students.find(x => x.id === editingStudentId);
+    s.name = name; s.parent = parent; s.phone = phone; s.fee = fee;
+    toast('Student updated');
+  } else {
+    d.students.push({
+      id: Date.now().toString(),
+      batchId: currentBatchId,
+      name, parent, phone, fee,
+      createdAt: new Date().toISOString()
+    });
+    toast('Student added');
+  }
+  save();
+  closeModal('modal-student');
+  renderDetail();
+}
+
+function deleteStudent(studentId) {
+  const s = data().students.find(x => x.id === studentId);
+  if (!s) return;
+  if (!confirm(`Delete "${s.name}"? Their attendance records will also be removed.`)) return;
+  const d = data();
+  d.students = d.students.filter(x => x.id !== studentId);
+  Object.keys(d.attendance).forEach(k => { if (d.attendance[k][studentId]) delete d.attendance[k][studentId]; });
+  save();
+  renderDetail();
+  toast('Student deleted');
+}
+
+// ============================================
+// PARENT MESSAGE
+// ============================================
+let messageText = '';
+
+function openMessageModal(studentId) {
+  const s = data().students.find(x => x.id === studentId);
+  if (!s) return;
+  const batch = data().batches.find(b => b.id === s.batchId);
+
+  // Use current viewed month
+  const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days);
+  const monthPrefix = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+  const extras = Object.keys(data().attendance)
+    .filter(k => k.startsWith(batch.id + '_') && k.includes(monthPrefix))
+    .map(k => k.substring(batch.id.length + 1))
+    .filter(date => !scheduled.includes(date));
+  const allDates = [...scheduled, ...extras].sort().filter(d => !isCancelled(batch.id, d));
+
+  const present = [], absent = [], recording = [], alternate = [];
+  allDates.forEach(date => {
+    const rec = getAttendance(batch.id, date, s.id);
+    if (!rec) return;
+    if (rec.status === 'present') present.push(date);
+    else if (rec.status === 'absent') absent.push(date);
+    else if (rec.status === 'recording') recording.push(date);
+    else if (rec.status === 'alternate') alternate.push({ original: date, alt: rec.alternateDate, note: rec.note });
+  });
+
+  const totalAttended = present.length + recording.length + alternate.length;
+  const totalFee = totalAttended * (s.fee || 0);
+  const pct = allDates.length ? Math.round((totalAttended / allDates.length) * 100) : 0;
+  const monthName = currentMonth.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
+  let msg = `Dear ${s.parent || 'Parent'},\n\n`;
+  msg += `Here is ${s.name}'s attendance summary for ${monthName}:\n\n`;
+  msg += `📚 Batch: Grade ${batch.grade} - ${batch.batchType}\n`;
+  msg += `📅 Total classes: ${allDates.length}\n`;
+  msg += `✅ Attended: ${totalAttended}\n`;
+  if (recording.length) msg += `   • ${recording.length} via recording\n`;
+  if (alternate.length) msg += `   • ${alternate.length} alternate class\n`;
+  msg += `❌ Absent: ${absent.length}\n`;
+  msg += `📊 Attendance: ${pct}%\n\n`;
+
+  if (present.length) msg += `Attended live: ${present.map(formatDateShort).join(', ')}\n`;
+  if (recording.length) msg += `Watched recording for: ${recording.map(formatDateShort).join(', ')}\n`;
+  if (alternate.length) {
+    alternate.forEach(a => {
+      msg += `Missed ${formatDateShort(a.original)}, attended alternate class on ${formatDateShort(a.alt)}`;
+      if (a.note) msg += ` (${a.note})`;
+      msg += `\n`;
+    });
+  }
+  if (absent.length) msg += `Absent: ${absent.map(formatDateShort).join(', ')}\n`;
+
+  msg += `\n💰 Fee Due: ₹${totalFee} (${totalAttended} × ₹${s.fee})\n\n`;
+
+  if (totalAttended === allDates.length && allDates.length > 0) msg += `${s.name} had perfect attendance this month! 🌟\n\n`;
+  else if (pct >= 75) msg += `${s.name} is doing well — keep it up! 👍\n\n`;
+
+  msg += `Thank you.`;
+
+  messageText = msg;
+  document.getElementById('message-modal-title').textContent = `Message for ${s.parent || s.name}`;
+  document.getElementById('message-preview').textContent = msg;
+  openModal('modal-message');
+}
+
+function copyMessage() {
+  navigator.clipboard.writeText(messageText).then(() => toast('Copied to clipboard'))
+    .catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = messageText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      toast('Copied to clipboard');
+    });
+}
+
+// ============================================
+// EXPORT
+// ============================================
+function exportCSV() {
+  const batch = data().batches.find(b => b.id === currentBatchId);
+  const students = data().students.filter(s => s.batchId === currentBatchId);
+  const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days);
+  const monthPrefix = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+  const extras = Object.keys(data().attendance)
+    .filter(k => k.startsWith(batch.id + '_') && k.includes(monthPrefix))
+    .map(k => k.substring(batch.id.length + 1))
+    .filter(date => !scheduled.includes(date));
+  const allDates = [...scheduled, ...extras].sort();
+
+  if (students.length === 0) { toast('No students to export'); return; }
+
+  const rows = [['Student', 'Parent', 'Phone', 'Fee/Class', ...allDates, 'Attended', 'Total Fee']];
+  students.forEach(s => {
+    let attended = 0;
+    const row = [s.name, s.parent || '', s.phone || '', s.fee];
+    allDates.forEach(date => {
+      const rec = getAttendance(batch.id, date, s.id);
+      let cell = '—';
+      if (isCancelled(batch.id, date)) cell = 'CANCELLED';
+      else if (rec) {
+        cell = rec.status;
+        if (rec.status === 'alternate' && rec.alternateDate) cell += ` (on ${rec.alternateDate})`;
+        if (['present', 'recording', 'alternate'].includes(rec.status)) attended++;
+      }
+      row.push(cell);
+    });
+    row.push(attended, attended * s.fee);
+    rows.push(row);
+  });
+
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const mLabel = currentMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).replace(' ', '');
+  a.download = `Grade${batch.grade}_${batch.batchType.replace(/\s/g, '')}_${mLabel}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV exported');
+}
+
+// ============================================
+// MODAL HELPERS
+// ============================================
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('active');
+  });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+});
+
+// ============================================
+// UTILS
+// ============================================
+function formatTime(time, ampm) {
+  if (!time) return '';
+  const [h, m] = time.split(':');
+  return `${parseInt(h)}:${m} ${ampm}`;
+}
+function formatDuration(min) {
+  const m = parseInt(min);
+  if (m < 60) return `${m} min`;
+  if (m === 60) return '1 hour';
+  if (m % 60 === 0) return `${m/60} hours`;
+  return `${Math.floor(m/60)}h ${m % 60}m`;
+}
+function formatDateNice(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+function formatDateShort(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+}
+function escapeHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function toast(message) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = message;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+
+// ============================================
+// INIT
+// ============================================
+load();
+renderHome();
+</script>
+
+</body>
+</html>      background: linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(71, 85, 105, 0.2);
       padding: 20px 40px;
