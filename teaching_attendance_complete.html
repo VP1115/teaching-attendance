@@ -433,6 +433,28 @@ try {
   sbClient = null;
 }
 
+// --- DB column-case bridge ---
+// Postgres lowercased all column names at table creation (batchId -> batchid, etc.).
+// lc() lowercases payload keys before sending; the *FromDb mappers convert rows back to camelCase.
+function lc(obj) {
+  const out = {};
+  for (const k in obj) out[k.toLowerCase()] = obj[k];
+  return out;
+}
+function batchFromDb(r) {
+  return {
+    id: r.id, mode: r.mode, grade: r.grade, batchType: r.batchtype,
+    days: r.days ? JSON.parse(r.days) : [],
+    time: r.time, ampm: r.ampm, duration: r.duration, notes: r.notes,
+    feePerClass: r.feeperclass, curriculum: r.curriculum,
+    selectedGrades: r.selectedgrades ? JSON.parse(r.selectedgrades) : [],
+    monthlyFee: r.monthlyfee, createdAt: r.createdat
+  };
+}
+function studentFromDb(r) {
+  return { id: r.id, batchId: r.batchid, name: r.name, parent: r.parent, phone: r.phone, fee: r.fee, createdAt: r.createdat };
+}
+
 // ============================================
 // STATE
 // ============================================
@@ -548,7 +570,7 @@ function localHasData() {
 async function pushLocalToCloud() {
   try {
     for (const b of batchesCache) {
-      await sbClient.from('batches').upsert({
+      await sbClient.from('batches').upsert(lc({
         id: b.id, mode: b.mode, grade: b.grade, batchType: b.batchType,
         days: JSON.stringify(b.days || []), time: b.time || '', ampm: b.ampm || '',
         duration: b.duration || '', notes: b.notes || null,
@@ -556,24 +578,24 @@ async function pushLocalToCloud() {
         curriculum: b.curriculum ?? null,
         selectedGrades: b.selectedGrades ? JSON.stringify(b.selectedGrades) : null,
         monthlyFee: b.monthlyFee ?? null
-      }, { onConflict: 'id' });
+      }), { onConflict: 'id' });
     }
     for (const s of studentsCache) {
-      await sbClient.from('students').upsert({
+      await sbClient.from('students').upsert(lc({
         id: s.id, batchId: s.batchId, name: s.name,
         parent: s.parent || null, phone: s.phone || null, fee: s.fee
-      }, { onConflict: 'id' });
+      }), { onConflict: 'id' });
     }
     for (const [key, day] of Object.entries(attendanceCache)) {
       const sep = key.lastIndexOf('_');
       const batchId = key.substring(0, sep);
       const date = key.substring(sep + 1);
       for (const [studentId, rec] of Object.entries(day)) {
-        await sbClient.from('attendance').upsert({
+        await sbClient.from('attendance').upsert(lc({
           id: `${batchId}_${date}_${studentId}`,
           batchId, date, studentId,
           status: rec.status, alternateDate: rec.alternateDate || null, note: rec.note || null
-        }, { onConflict: 'id' });
+        }), { onConflict: 'id' });
       }
     }
     for (const [key, val] of Object.entries(feesCache)) {
@@ -582,16 +604,16 @@ async function pushLocalToCloud() {
       const month = key.substring(sep + 1);
       const student = studentsCache.find(s => s.id === studentId);
       if (!student) continue;
-      await sbClient.from('fees').upsert({
+      await sbClient.from('fees').upsert(lc({
         id: `${studentId}_${month}`, studentId, batchId: student.batchId, month,
         paid: !!val.paid, paidDate: val.paidDate || null
-      }, { onConflict: 'id' });
+      }), { onConflict: 'id' });
     }
     for (const key of Object.keys(cancelledCache)) {
       const sep = key.lastIndexOf('_');
       const batchId = key.substring(0, sep);
       const date = key.substring(sep + 1);
-      await sbClient.from('cancelled_dates').upsert({ id: `${batchId}_${date}`, batchId, date }, { onConflict: 'id' });
+      await sbClient.from('cancelled_dates').upsert(lc({ id: `${batchId}_${date}`, batchId, date }), { onConflict: 'id' });
     }
     toast('Local data backed up to cloud ✓');
   } catch (e) {
@@ -604,23 +626,19 @@ async function loadFromSupabase() {
     // Load ALL batches (both modes); we filter by mode at render time.
     const { data: batches, error: bErr } = await sbClient.from('batches').select('*');
     if (bErr) throw bErr;
-    batchesCache = (batches || []).map(b => ({
-      ...b,
-      days: JSON.parse(b.days || '[]'),
-      selectedGrades: b.selectedGrades ? JSON.parse(b.selectedGrades) : []
-    }));
+    batchesCache = (batches || []).map(batchFromDb);
 
     const { data: students } = await sbClient.from('students').select('*');
-    studentsCache = students || [];
+    studentsCache = (students || []).map(studentFromDb);
 
     const { data: attendance } = await sbClient.from('attendance').select('*');
     attendanceCache = {};
     (attendance || []).forEach(rec => {
-      const key = `${rec.batchId}_${rec.date}`;
+      const key = `${rec.batchid}_${rec.date}`;
       if (!attendanceCache[key]) attendanceCache[key] = {};
-      attendanceCache[key][rec.studentId] = {
+      attendanceCache[key][rec.studentid] = {
         status: rec.status,
-        alternateDate: rec.alternateDate,
+        alternateDate: rec.alternatedate,
         note: rec.note
       };
     });
@@ -628,12 +646,12 @@ async function loadFromSupabase() {
     const { data: fees } = await sbClient.from('fees').select('*');
     feesCache = {};
     (fees || []).forEach(fee => {
-      feesCache[`${fee.studentId}_${fee.month}`] = { paid: fee.paid, paidDate: fee.paidDate };
+      feesCache[`${fee.studentid}_${fee.month}`] = { paid: fee.paid, paidDate: fee.paiddate };
     });
 
     const { data: cancelled } = await sbClient.from('cancelled_dates').select('*');
     cancelledCache = {};
-    (cancelled || []).forEach(c => { cancelledCache[`${c.batchId}_${c.date}`] = true; });
+    (cancelled || []).forEach(c => { cancelledCache[`${c.batchid}_${c.date}`] = true; });
 
     return (batchesCache.length + studentsCache.length + Object.keys(attendanceCache).length) > 0;
   } catch (e) {
@@ -1066,19 +1084,19 @@ async function toggleFeePaid(studentId, monthKey, paid) {
   const batch = batchesCache.find(b => b.id === currentBatchId);
 
   if (synced) {
-    const existing = await sbClient.from('fees').select('id').eq('studentId', studentId).eq('batchId', currentBatchId).eq('month', monthKey).single();
+    const existing = await sbClient.from('fees').select('id').eq('studentid', studentId).eq('batchid', currentBatchId).eq('month', monthKey).single();
     
     if (existing.data) {
-      await sbClient.from('fees').update({ paid }).eq('studentId', studentId).eq('batchId', currentBatchId).eq('month', monthKey);
+      await sbClient.from('fees').update(lc({ paid })).eq('studentid', studentId).eq('batchid', currentBatchId).eq('month', monthKey);
     } else {
-      await sbClient.from('fees').insert([{
+      await sbClient.from('fees').insert([lc({
         id: `${studentId}_${monthKey}`,
         studentId,
         batchId: currentBatchId,
         month: monthKey,
         paid,
         paidDate: paid ? formatDateKey(new Date()) : null
-      }]);
+      })]);
     }
   }
 
@@ -1091,19 +1109,19 @@ async function updateFeeDate(studentId, monthKey, paidDate) {
   const key = `${studentId}_${monthKey}`;
   
   if (synced) {
-    const existing = await sbClient.from('fees').select('id').eq('studentId', studentId).eq('batchId', currentBatchId).eq('month', monthKey).single();
+    const existing = await sbClient.from('fees').select('id').eq('studentid', studentId).eq('batchid', currentBatchId).eq('month', monthKey).single();
     
     if (existing.data) {
-      await sbClient.from('fees').update({ paidDate }).eq('studentId', studentId).eq('batchId', currentBatchId).eq('month', monthKey);
+      await sbClient.from('fees').update(lc({ paidDate })).eq('studentid', studentId).eq('batchid', currentBatchId).eq('month', monthKey);
     } else {
-      await sbClient.from('fees').insert([{
+      await sbClient.from('fees').insert([lc({
         id: `${studentId}_${monthKey}`,
         studentId,
         batchId: currentBatchId,
         month: monthKey,
         paid: true,
         paidDate
-      }]);
+      })]);
     }
   }
 
@@ -1144,18 +1162,18 @@ async function setAttendance(status) {
   if (status === null) {
     delete attendanceCache[key][studentId];
     if (synced) {
-      await sbClient.from('attendance').delete().eq('batchId', batchId).eq('date', date).eq('studentId', studentId);
+      await sbClient.from('attendance').delete().eq('batchid', batchId).eq('date', date).eq('studentid', studentId);
     }
   } else {
     attendanceCache[key][studentId] = { status };
     if (synced) {
-      await sbClient.from('attendance').upsert({
+      await sbClient.from('attendance').upsert(lc({
         id: `${batchId}_${date}_${studentId}`,
         batchId, date, studentId,
         status,
         alternateDate: null,
         note: null
-      }, { onConflict: 'id' });
+      }), { onConflict: 'id' });
     }
   }
   
@@ -1196,13 +1214,13 @@ async function saveAlternate() {
   };
 
   if (synced) {
-    await sbClient.from('attendance').upsert({
+    await sbClient.from('attendance').upsert(lc({
       id: `${batchId}_${date}_${studentId}`,
       batchId, date, studentId,
       status: 'alternate',
       alternateDate: altDate,
       note
-    }, { onConflict: 'id' });
+    }), { onConflict: 'id' });
   }
 
   saveToLocalStorage();
@@ -1237,13 +1255,13 @@ function markAllPresent() {
       if (!attendanceCache[key][s.id]) {
         attendanceCache[key][s.id] = { status: 'present' };
         if (synced) {
-          sbClient.from('attendance').upsert({
+          sbClient.from('attendance').upsert(lc({
             id: `${batch.id}_${date}_${s.id}`,
             batchId: batch.id,
             date,
             studentId: s.id,
             status: 'present'
-          }, { onConflict: 'id' });
+          }), { onConflict: 'id' });
         }
         count++;
       }
@@ -1264,17 +1282,17 @@ async function toggleCancelDate(batchId, date) {
   if (cancelledCache[key]) {
     delete cancelledCache[key];
     if (synced) {
-      await sbClient.from('cancelled_dates').delete().eq('batchId', batchId).eq('date', date);
+      await sbClient.from('cancelled_dates').delete().eq('batchid', batchId).eq('date', date);
     }
     toast('Class restored');
   } else {
     cancelledCache[key] = true;
     if (synced) {
-      await sbClient.from('cancelled_dates').insert([{
+      await sbClient.from('cancelled_dates').insert([lc({
         id: `${batchId}_${date}`,
         batchId,
         date
-      }]);
+      })]);
     }
     toast('Class cancelled');
   }
@@ -1715,7 +1733,7 @@ async function saveBatch() {
     const idx = batchesCache.findIndex(x => x.id === editingBatchId);
     batchesCache[idx] = { ...batchesCache[idx], ...batchData };
     if (synced) {
-      const { error } = await sbClient.from('batches').update(toDbPayload(batchData)).eq('id', editingBatchId);
+      const { error } = await sbClient.from('batches').update(lc(toDbPayload(batchData))).eq('id', editingBatchId);
       if (error) { synced = false; toast('Saved on device (cloud write failed)'); }
     }
     toast('Batch updated');
@@ -1724,7 +1742,7 @@ async function saveBatch() {
     const newBatch = { id, ...batchData, createdAt: new Date().toISOString() };
     batchesCache.push(newBatch);
     if (synced) {
-      const { error } = await sbClient.from('batches').insert([{ id, ...toDbPayload(newBatch) }]);
+      const { error } = await sbClient.from('batches').insert([lc({ id, ...toDbPayload(newBatch) })]);
       if (error) { synced = false; toast('Saved on device (cloud write failed)'); }
     }
     toast('Batch created');
@@ -1811,7 +1829,7 @@ async function saveStudent() {
     const idx = studentsCache.findIndex(x => x.id === editingStudentId);
     studentsCache[idx] = { ...studentsCache[idx], name, parent, phone, fee };
     if (synced) {
-      await sbClient.from('students').update({ name, parent, phone, fee }).eq('id', editingStudentId);
+      await sbClient.from('students').update(lc({ name, parent, phone, fee })).eq('id', editingStudentId);
     }
     toast('Student updated');
   } else {
@@ -1819,7 +1837,7 @@ async function saveStudent() {
     const newStudent = { id, batchId: currentBatchId, name, parent, phone, fee, createdAt: new Date().toISOString() };
     studentsCache.push(newStudent);
     if (synced) {
-      await sbClient.from('students').insert([newStudent]);
+      await sbClient.from('students').insert([lc(newStudent)]);
     }
     toast('Student added');
   }
