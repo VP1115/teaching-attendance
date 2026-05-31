@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TeachingTracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 :root {
   --bg: #0a0a14;
   --surface: rgba(30, 30, 60, 0.4);
@@ -27,7 +27,6 @@
   --recording: #a855f7;
   --gradient: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
 }
-
 body {
   font-family: 'Inter', -apple-system, sans-serif;
   background: var(--bg);
@@ -39,7 +38,6 @@ body {
     radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
 }
-
 .header {
   padding: 24px 40px;
   display: flex;
@@ -52,7 +50,6 @@ body {
   background: rgba(10, 10, 20, 0.7);
   backdrop-filter: blur(20px);
 }
-
 .logo {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 24px;
@@ -62,11 +59,9 @@ body {
   -webkit-text-fill-color: transparent;
   cursor: pointer;
 }
-
 .mode-switch { display: flex; background: rgba(20, 20, 40, 0.5); border-radius: 10px; padding: 4px; border: 1px solid var(--border); }
 .mode-btn { padding: 8px 16px; background: transparent; border: none; color: var(--text-dim); font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 7px; transition: all 0.2s; font-family: inherit; }
 .mode-btn.active { background: var(--gradient); color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); }
-
 .btn { padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer; border: none; font-family: inherit; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
 .btn-primary { background: var(--gradient); color: white; box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3); }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4); }
@@ -78,28 +73,22 @@ body {
 .btn-success:hover { background: rgba(16, 185, 129, 0.25); }
 .btn-sm { padding: 7px 12px; font-size: 12px; }
 .btn-icon { padding: 8px; width: 34px; height: 34px; justify-content: center; }
-
 .container { max-width: 1400px; margin: 0 auto; padding: 32px 40px; }
-
 .page-header { margin-bottom: 28px; }
 .page-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 34px; font-weight: 800; margin-bottom: 6px; letter-spacing: -1px; }
 .page-subtitle { color: var(--text-dim); font-size: 14px; }
-
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 32px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 22px; backdrop-filter: blur(20px); transition: all 0.3s; }
 .stat-card:hover { transform: translateY(-2px); border-color: var(--border-hover); }
 .stat-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 30px; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 6px; }
 .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-
 .empty-state { text-align: center; padding: 80px 20px; }
 .empty-icon { font-size: 72px; margin-bottom: 18px; display: inline-block; animation: float 3s ease-in-out infinite; }
 @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 .empty-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 8px; }
 .empty-text { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
-
 .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
 .section-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 700; }
-
 .batches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
 .batch-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 22px; backdrop-filter: blur(20px); cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
 .batch-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient); }
@@ -111,23 +100,18 @@ body {
 .batch-card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--border); }
 .student-count { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
 .batch-card-actions { display: flex; gap: 6px; }
-
 .detail-back { display: flex; align-items: center; gap: 6px; color: var(--text-dim); font-size: 13px; cursor: pointer; margin-bottom: 12px; background: none; border: none; font-family: inherit; padding: 6px 10px 6px 0; transition: color 0.2s; }
 .detail-back:hover { color: var(--primary-light); }
 .detail-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
 .detail-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 30px; font-weight: 800; margin-bottom: 4px; }
 .detail-meta { color: var(--text-dim); font-size: 14px; }
 .detail-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-/* Month switcher */
 .month-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
 .month-nav { display: flex; align-items: center; gap: 12px; }
 .month-arrow { background: rgba(139, 92, 246, 0.15); border: 1px solid var(--border); color: var(--text); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
 .month-arrow:hover { background: rgba(139, 92, 246, 0.3); }
 .month-label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700; min-width: 160px; text-align: center; }
 .month-info { font-size: 12px; color: var(--text-dim); }
-
-/* Table */
 .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px); overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 600px; }
 th { background: rgba(139, 92, 246, 0.08); padding: 12px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); white-space: nowrap; }
@@ -141,8 +125,6 @@ tr:hover td { background: rgba(139, 92, 246, 0.04); }
 td.center { text-align: center; }
 .student-name { font-weight: 600; }
 .student-parent { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
-
-/* Attendance pill */
 .att-pill { display: inline-flex; align-items: center; justify-content: center; padding: 5px 10px; border-radius: 16px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1.5px solid; background: rgba(100, 116, 139, 0.08); color: var(--text-muted); border-color: rgba(100, 116, 139, 0.25); transition: all 0.15s; min-width: 56px; height: 28px; position: relative; }
 .att-pill:hover { transform: scale(1.08); }
 .att-pill.present { background: rgba(16, 185, 129, 0.15); color: var(--success); border-color: rgba(16, 185, 129, 0.4); }
@@ -150,34 +132,46 @@ td.center { text-align: center; }
 .att-pill.recording { background: rgba(168, 85, 247, 0.15); color: var(--recording); border-color: rgba(168, 85, 247, 0.4); }
 .att-pill.alternate { background: rgba(59, 130, 246, 0.15); color: var(--blue); border-color: rgba(59, 130, 246, 0.4); }
 .att-pill.cancelled-cell { opacity: 0.3; pointer-events: none; }
-
 .date-col-header { display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
 .date-col-header .date-actions { position: absolute; top: -8px; right: -8px; opacity: 0; transition: opacity 0.2s; }
 th:hover .date-actions { opacity: 1; }
 .date-action-btn { background: rgba(20, 20, 40, 0.9); border: 1px solid var(--border); border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; color: var(--text-dim); display: flex; align-items: center; justify-content: center; }
 .date-action-btn:hover { color: var(--danger); border-color: var(--danger); }
-
-/* Modal */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.25s; padding: 20px; }
 .modal-overlay.active { opacity: 1; visibility: visible; }
 .modal { background: linear-gradient(135deg, rgba(30, 30, 60, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%); border: 1px solid var(--border); border-radius: 22px; padding: 30px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto; backdrop-filter: blur(40px); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5); transform: scale(0.95); transition: transform 0.25s; }
 .modal-overlay.active .modal { transform: scale(1); }
 .modal-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 22px; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .modal-subtitle { color: var(--text-dim); font-size: 13px; margin-top: -16px; margin-bottom: 22px; }
-
 .form-group { margin-bottom: 18px; }
 .form-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
 .form-input, .form-select { width: 100%; padding: 11px 14px; background: rgba(20, 20, 40, 0.5); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: inherit; font-size: 14px; transition: all 0.2s; }
 .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary); background: rgba(20, 20, 40, 0.8); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
 .days-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .day-check { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: rgba(20, 20, 40, 0.4); border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s; }
 .day-check:hover { border-color: var(--border-hover); }
 .day-check.checked { background: rgba(139, 92, 246, 0.15); border-color: var(--primary); }
 .day-check input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
 .day-check label { cursor: pointer; font-size: 13px; font-weight: 500; flex: 1; user-select: none; }
-
+.grades-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.grade-check { display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(20, 20, 40, 0.4); border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.grade-check:hover { border-color: var(--border-hover); }
+.grade-check.checked { background: rgba(139, 92, 246, 0.15); border-color: var(--primary); }
+.grade-check input { width: 14px; height: 14px; accent-color: var(--primary); cursor: pointer; }
+.grade-check label { cursor: pointer; font-size: 12px; font-weight: 500; user-select: none; }
+.grade-multiselect { position: relative; }
+.grade-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.grade-chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; background: rgba(139, 92, 246, 0.2); border: 1px solid var(--primary); border-radius: 16px; font-size: 13px; font-weight: 600; }
+.grade-chip .chip-x { cursor: pointer; opacity: 0.6; font-weight: 700; font-size: 14px; line-height: 1; }
+.grade-chip .chip-x:hover { opacity: 1; color: var(--danger); }
+.add-grade-btn { background: rgba(20, 20, 40, 0.5); border: 1.5px dashed var(--border-hover); color: var(--primary-light); padding: 9px 14px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+.add-grade-btn:hover { border-color: var(--primary); background: rgba(139, 92, 246, 0.1); }
+.grade-dropdown { position: absolute; z-index: 20; margin-top: 6px; left: 0; right: 0; background: rgba(25, 25, 48, 0.99); border: 1px solid var(--border-hover); border-radius: 12px; padding: 10px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6); }
+.grade-dropdown.hidden { display: none; }
+.grade-opt { padding: 9px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; background: rgba(139, 92, 246, 0.1); border: 1px solid transparent; transition: all 0.15s; }
+.grade-opt:hover { background: rgba(139, 92, 246, 0.3); border-color: var(--primary); }
+.grade-empty { grid-column: 1 / -1; text-align: center; color: var(--text-dim); font-size: 12px; padding: 8px; }
 .time-picker { display: flex; gap: 8px; align-items: center; }
 .time-input { width: 70px; padding: 11px; background: rgba(20, 20, 40, 0.5); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700; text-align: center; }
 .time-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15); }
@@ -185,19 +179,13 @@ th:hover .date-actions { opacity: 1; }
 .ampm-select { padding: 11px 12px; background: rgba(20, 20, 40, 0.5); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
 .time-preview { margin-top: 10px; padding: 10px 14px; background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success); border-radius: 8px; font-size: 13px; color: var(--text); display: none; }
 .time-preview.show { display: block; }
-
 .error-msg { padding: 10px 14px; background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--danger); border-radius: 8px; color: var(--danger); font-size: 13px; margin-bottom: 14px; display: none; }
 .error-msg.show { display: block; }
-
 .form-actions { display: flex; gap: 10px; margin-top: 22px; }
 .form-actions .btn { flex: 1; justify-content: center; }
-
 .toast { position: fixed; bottom: 24px; right: 24px; padding: 13px 20px; background: var(--gradient); color: white; border-radius: 12px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4); z-index: 2000; animation: slideInUp 0.3s ease; }
 @keyframes slideInUp { from { transform: translateY(80px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
 .message-preview { background: rgba(20, 20, 40, 0.5); border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.6; white-space: pre-wrap; max-height: 400px; overflow-y: auto; margin-bottom: 16px; }
-
-/* Attendance picker — when you click a cell */
 .att-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .att-option { padding: 14px; border-radius: 10px; cursor: pointer; border: 1.5px solid var(--border); background: rgba(20, 20, 40, 0.4); transition: all 0.2s; text-align: center; }
 .att-option:hover { border-color: var(--border-hover); transform: translateY(-2px); }
@@ -209,7 +197,19 @@ th:hover .date-actions { opacity: 1; }
 .att-option.recording { border-color: rgba(168, 85, 247, 0.4); }
 .att-option.alternate { border-color: rgba(59, 130, 246, 0.4); }
 .att-option.clear { grid-column: 1 / -1; padding: 10px; }
-
+.fee-table { width: 100%; border-collapse: collapse; }
+.fee-table th { background: rgba(139, 92, 246, 0.08); padding: 12px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+.fee-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.fee-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.fee-row:last-child { border-bottom: none; }
+.fee-check { display: flex; align-items: center; gap: 8px; }
+.fee-check input { width: 18px; height: 18px; accent-color: var(--success); cursor: pointer; }
+.fee-student-name { font-weight: 600; flex: 1; }
+.fee-date { font-size: 12px; color: var(--text-dim); }
+.fee-date input { width: 120px; padding: 6px 10px; background: rgba(20, 20, 40, 0.5); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: inherit; font-size: 12px; cursor: pointer; }
+.loading { display: flex; align-items: center; justify-content: center; height: 100vh; }
+.spinner { width: 40px; height: 40px; border: 3px solid rgba(139, 92, 246, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 @media (max-width: 768px) {
   .header { padding: 16px 20px; flex-wrap: wrap; gap: 12px; }
   .container { padding: 20px; }
@@ -217,11 +217,11 @@ th:hover .date-actions { opacity: 1; }
   .detail-title { font-size: 24px; }
   .form-row { grid-template-columns: 1fr; }
   .days-grid { grid-template-columns: 1fr; }
+  .grades-grid { grid-template-columns: repeat(3, 1fr); }
   .batches-grid { grid-template-columns: 1fr; }
   .modal { padding: 22px; }
   .att-picker { grid-template-columns: 1fr; }
 }
-
 .hidden { display: none !important; }
 </style>
 </head>
@@ -254,7 +254,7 @@ th:hover .date-actions { opacity: 1; }
       </div>
       <div class="detail-actions">
         <button class="btn btn-ghost btn-sm" onclick="openEditBatchModal()">⚙️ Edit Batch</button>
-        <button class="btn btn-ghost btn-sm" onclick="openExtraClassModal()">➕ Extra Class</button>
+        <button class="btn btn-ghost btn-sm" id="extra-class-btn" onclick="openExtraClassModal()">➕ Extra Class</button>
         <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📊 Export</button>
         <button class="btn btn-primary btn-sm" onclick="openStudentModal()">+ Add Student</button>
       </div>
@@ -267,11 +267,23 @@ th:hover .date-actions { opacity: 1; }
         <button class="month-arrow" onclick="changeMonth(1)">→</button>
       </div>
       <div class="month-info" id="month-info"></div>
-      <button class="btn btn-success btn-sm" onclick="markAllPresent()">✓ Mark All Present</button>
+      <button class="btn btn-success btn-sm" id="mark-all-btn" onclick="markAllPresent()">✓ Mark All Present</button>
     </div>
 
     <div class="stats-grid" id="detail-stats"></div>
     <div id="detail-content"></div>
+
+    <!-- FEE STATUS SECTION (OFFLINE ONLY) -->
+    <div id="fee-status-section" class="hidden" style="margin-top: 40px;">
+      <div class="section-header">
+        <h2 class="section-title" id="fee-status-title">Fee Status</h2>
+      </div>
+      <div id="fee-status-content"></div>
+    </div>
+  </div>
+
+  <div class="loading hidden" id="loading-screen">
+    <div class="spinner"></div>
   </div>
 </div>
 
@@ -279,63 +291,7 @@ th:hover .date-actions { opacity: 1; }
 <div class="modal-overlay" id="modal-batch">
   <div class="modal">
     <div class="modal-title" id="batch-modal-title">Create New Batch</div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Grade</label>
-        <select class="form-select" id="f-grade">
-          <option value="">Select...</option>
-          <option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option>
-          <option value="4">Grade 4</option><option value="5">Grade 5</option><option value="6">Grade 6</option>
-          <option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option>
-          <option value="10">Grade 10</option><option value="11">Grade 11</option><option value="12">Grade 12</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Batch</label>
-        <select class="form-select" id="f-batchtype">
-          <option value="">Select...</option>
-          <option value="Batch 1">Batch 1</option><option value="Batch 2">Batch 2</option>
-          <option value="Batch 3">Batch 3</option><option value="Batch 4">Batch 4</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Days of the Week (recurring)</label>
-      <div class="days-grid" id="days-grid">
-        <div class="day-check" onclick="toggleDay(this, 'Monday')"><input type="checkbox"><label>Monday</label></div>
-        <div class="day-check" onclick="toggleDay(this, 'Tuesday')"><input type="checkbox"><label>Tuesday</label></div>
-        <div class="day-check" onclick="toggleDay(this, 'Wednesday')"><input type="checkbox"><label>Wednesday</label></div>
-        <div class="day-check" onclick="toggleDay(this, 'Thursday')"><input type="checkbox"><label>Thursday</label></div>
-        <div class="day-check" onclick="toggleDay(this, 'Friday')"><input type="checkbox"><label>Friday</label></div>
-        <div class="day-check" onclick="toggleDay(this, 'Saturday')"><input type="checkbox"><label>Saturday</label></div>
-        <div class="day-check" onclick="toggleDay(this, 'Sunday')"><input type="checkbox"><label>Sunday</label></div>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Class Time</label>
-      <div class="time-picker">
-        <input type="text" inputmode="numeric" maxlength="2" class="time-input" id="f-hours" placeholder="7" oninput="updateTimePreview()">
-        <span class="time-separator">:</span>
-        <input type="text" inputmode="numeric" maxlength="2" class="time-input" id="f-minutes" placeholder="15" oninput="updateTimePreview()">
-        <select class="ampm-select" id="f-ampm" onchange="updateTimePreview()">
-          <option value="AM">AM</option><option value="PM" selected>PM</option>
-        </select>
-      </div>
-      <div class="time-preview" id="time-preview"></div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Duration</label>
-      <select class="form-select" id="f-duration">
-        <option value="">Select...</option>
-        <option value="30">30 minutes</option><option value="45">45 minutes</option>
-        <option value="60">1 hour</option><option value="75">1 hour 15 minutes</option>
-        <option value="90">1 hour 30 minutes</option><option value="120">2 hours</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Notes (Optional)</label>
-      <input type="text" class="form-input" id="f-notes" placeholder="e.g., Advanced batch, Zoom link...">
-    </div>
+    <div id="batch-mode-fields"></div>
     <div class="error-msg" id="batch-error"></div>
     <div class="form-actions">
       <button class="btn btn-ghost" onclick="closeModal('modal-batch')">Cancel</button>
@@ -362,8 +318,8 @@ th:hover .date-actions { opacity: 1; }
         <input type="tel" class="form-input" id="s-phone" placeholder="e.g., 9876543210">
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Fee per Class (₹) *</label>
+    <div class="form-group" id="student-fee-group">
+      <label class="form-label" id="student-fee-label">Fee per Class (₹) *</label>
       <input type="number" class="form-input" id="s-fee" value="500" min="0">
     </div>
     <div class="error-msg" id="student-error"></div>
@@ -459,41 +415,284 @@ th:hover .date-actions { opacity: 1; }
 
 <script>
 // ============================================
-// STATE & PERSISTENCE
+// SUPABASE SETUP
 // ============================================
-let state = {
-  online: { batches: [], students: [], attendance: {}, cancelled: {} },
-  offline: { batches: [], students: [], attendance: {}, cancelled: {} }
-};
+const SUPABASE_URL = 'https://didafulizjpntvrjhyou.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_UITuVqEe9uOr54d36ZQJTA_qD1eiXQz';
+// Defensive: if the Supabase library failed to load (offline, blocked, file://),
+// the app must STILL run fully in local-only mode. Never throw at the top level.
+let sbClient = null;
+try {
+  if (window.supabase && typeof window.supabase.createClient === 'function') {
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  } else {
+    console.warn('Supabase library not available — running in local-only mode.');
+  }
+} catch (e) {
+  console.error('Supabase init failed — running in local-only mode.', e);
+  sbClient = null;
+}
+
+// ============================================
+// STATE
+// ============================================
 let currentMode = 'online';
 let currentView = 'home';
 let currentBatchId = null;
-let currentMonth = new Date(); // first day of current viewed month
+let currentMonth = new Date();
 let editingBatchId = null;
 let editingStudentId = null;
 let selectedDays = [];
-let attendanceContext = null; // {batchId, date, studentId}
+let selectedGrades = [];
+let attendanceContext = null;
+let messageText = '';
+let synced = false;
 
-function load() {
+// In-memory cache to reduce API calls
+let batchesCache = [];
+let studentsCache = [];
+let attendanceCache = {};
+let feesCache = {};
+let cancelledCache = {};
+
+// ============================================
+// INIT & MIGRATION
+// ============================================
+async function init() {
+  const loadingEl = document.getElementById('loading-screen');
+  if (loadingEl) loadingEl.classList.remove('hidden');
+
+  // 1. ALWAYS load local data first (imports old v6 data too) so the app works instantly.
+  loadFromLocalStorage();
+
+  // 2. Snapshot the local data BEFORE any cloud query can overwrite the cache.
+  const localSnapshot = snapshotCache();
+  const hadLocal = localHasData();
+
+  // 3. Probe the cloud. If reachable, sync intelligently. If not, stay on local.
   try {
-    const saved = localStorage.getItem('tt_state_v6');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      state = { ...state, ...parsed };
-      // Ensure cancelled exists
-      ['online', 'offline'].forEach(m => {
-        if (!state[m].cancelled) state[m].cancelled = {};
-      });
+    const reachable = await probeSupabase();
+    if (reachable) {
+      const cloudHadData = await loadFromSupabase(); // NOTE: this replaces the cache with cloud data
+      if (cloudHadData) {
+        // Cloud is the source of truth — mirror it locally as backup.
+        saveToLocalStorage();
+        toast('Connected to cloud ☁️');
+      } else if (hadLocal) {
+        // Cloud is empty but we DO have local data — restore it and push it up (first-time migration).
+        restoreCache(localSnapshot);
+        await pushLocalToCloud();
+        saveToLocalStorage();
+        toast('Local data backed up to cloud ☁️');
+      } else {
+        toast('Connected to cloud ☁️');
+      }
+      synced = true;
+    } else {
+      // Cloud unreachable — make sure the cache still holds the local data.
+      restoreCache(localSnapshot);
+      synced = false;
+      toast('Cloud unreachable — saved on this device');
     }
-  } catch (e) { console.error('Load failed', e); }
+  } catch (e) {
+    console.error('Cloud sync failed', e);
+    restoreCache(localSnapshot); // never lose local data on error
+    synced = false;
+    toast('Cloud error — saved on this device');
+  }
+
+  renderHome();
+  if (loadingEl) loadingEl.classList.add('hidden');
 }
 
-function save() {
-  try { localStorage.setItem('tt_state_v6', JSON.stringify(state)); }
-  catch (e) { console.error('Save failed', e); }
+// Deep-ish snapshot of the in-memory cache (used to protect local data during cloud sync).
+function snapshotCache() {
+  return {
+    batches: JSON.parse(JSON.stringify(batchesCache)),
+    students: JSON.parse(JSON.stringify(studentsCache)),
+    attendance: JSON.parse(JSON.stringify(attendanceCache)),
+    fees: JSON.parse(JSON.stringify(feesCache)),
+    cancelled: JSON.parse(JSON.stringify(cancelledCache))
+  };
+}
+function restoreCache(snap) {
+  batchesCache = snap.batches;
+  studentsCache = snap.students;
+  attendanceCache = snap.attendance;
+  feesCache = snap.fees;
+  cancelledCache = snap.cancelled;
 }
 
-function data() { return state[currentMode]; }
+// Quick connectivity + permissions probe. Returns true only if we can actually read.
+async function probeSupabase() {
+  if (!sbClient) return false;
+  try {
+    const { error } = await sbClient.from('batches').select('id').limit(1);
+    if (error) {
+      console.error('Supabase probe error:', error.message);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('Supabase probe threw:', e);
+    return false;
+  }
+}
+
+function localHasData() {
+  return batchesCache.length > 0 || studentsCache.length > 0 ||
+         Object.keys(attendanceCache).length > 0;
+}
+
+// Push everything currently in local cache up to the cloud (best effort, error-checked).
+async function pushLocalToCloud() {
+  try {
+    for (const b of batchesCache) {
+      await sbClient.from('batches').upsert({
+        id: b.id, mode: b.mode, grade: b.grade, batchType: b.batchType,
+        days: JSON.stringify(b.days || []), time: b.time || '', ampm: b.ampm || '',
+        duration: b.duration || '', notes: b.notes || null,
+        feePerClass: b.feePerClass ?? null,
+        curriculum: b.curriculum ?? null,
+        selectedGrades: b.selectedGrades ? JSON.stringify(b.selectedGrades) : null,
+        monthlyFee: b.monthlyFee ?? null
+      }, { onConflict: 'id' });
+    }
+    for (const s of studentsCache) {
+      await sbClient.from('students').upsert({
+        id: s.id, batchId: s.batchId, name: s.name,
+        parent: s.parent || null, phone: s.phone || null, fee: s.fee
+      }, { onConflict: 'id' });
+    }
+    for (const [key, day] of Object.entries(attendanceCache)) {
+      const sep = key.lastIndexOf('_');
+      const batchId = key.substring(0, sep);
+      const date = key.substring(sep + 1);
+      for (const [studentId, rec] of Object.entries(day)) {
+        await sbClient.from('attendance').upsert({
+          id: `${batchId}_${date}_${studentId}`,
+          batchId, date, studentId,
+          status: rec.status, alternateDate: rec.alternateDate || null, note: rec.note || null
+        }, { onConflict: 'id' });
+      }
+    }
+    for (const [key, val] of Object.entries(feesCache)) {
+      const sep = key.lastIndexOf('_');
+      const studentId = key.substring(0, sep);
+      const month = key.substring(sep + 1);
+      const student = studentsCache.find(s => s.id === studentId);
+      if (!student) continue;
+      await sbClient.from('fees').upsert({
+        id: `${studentId}_${month}`, studentId, batchId: student.batchId, month,
+        paid: !!val.paid, paidDate: val.paidDate || null
+      }, { onConflict: 'id' });
+    }
+    for (const key of Object.keys(cancelledCache)) {
+      const sep = key.lastIndexOf('_');
+      const batchId = key.substring(0, sep);
+      const date = key.substring(sep + 1);
+      await sbClient.from('cancelled_dates').upsert({ id: `${batchId}_${date}`, batchId, date }, { onConflict: 'id' });
+    }
+    toast('Local data backed up to cloud ✓');
+  } catch (e) {
+    console.error('pushLocalToCloud failed', e);
+  }
+}
+
+async function loadFromSupabase() {
+  try {
+    // Load ALL batches (both modes); we filter by mode at render time.
+    const { data: batches, error: bErr } = await sbClient.from('batches').select('*');
+    if (bErr) throw bErr;
+    batchesCache = (batches || []).map(b => ({
+      ...b,
+      days: JSON.parse(b.days || '[]'),
+      selectedGrades: b.selectedGrades ? JSON.parse(b.selectedGrades) : []
+    }));
+
+    const { data: students } = await sbClient.from('students').select('*');
+    studentsCache = students || [];
+
+    const { data: attendance } = await sbClient.from('attendance').select('*');
+    attendanceCache = {};
+    (attendance || []).forEach(rec => {
+      const key = `${rec.batchId}_${rec.date}`;
+      if (!attendanceCache[key]) attendanceCache[key] = {};
+      attendanceCache[key][rec.studentId] = {
+        status: rec.status,
+        alternateDate: rec.alternateDate,
+        note: rec.note
+      };
+    });
+
+    const { data: fees } = await sbClient.from('fees').select('*');
+    feesCache = {};
+    (fees || []).forEach(fee => {
+      feesCache[`${fee.studentId}_${fee.month}`] = { paid: fee.paid, paidDate: fee.paidDate };
+    });
+
+    const { data: cancelled } = await sbClient.from('cancelled_dates').select('*');
+    cancelledCache = {};
+    (cancelled || []).forEach(c => { cancelledCache[`${c.batchId}_${c.date}`] = true; });
+
+    return (batchesCache.length + studentsCache.length + Object.keys(attendanceCache).length) > 0;
+  } catch (e) {
+    console.error('Supabase load failed', e);
+    throw e;
+  }
+}
+
+function loadFromLocalStorage() {
+  try {
+    const saved = localStorage.getItem('tt_state_v7');
+    if (saved) {
+      const data = JSON.parse(saved);
+      batchesCache = data.batches || [];
+      studentsCache = data.students || [];
+      attendanceCache = data.attendance || {};
+      feesCache = data.fees || {};
+      cancelledCache = data.cancelled || {};
+      return;
+    }
+    // Fall back: import old v6-format data ({online:{...}, offline:{...}}) into the flat cache.
+    const old = localStorage.getItem('tt_state_v6');
+    if (old) {
+      const data = JSON.parse(old);
+      batchesCache = []; studentsCache = []; attendanceCache = {}; cancelledCache = {}; feesCache = {};
+      ['online', 'offline'].forEach(mode => {
+        const md = data[mode] || {};
+        (md.batches || []).forEach(b => batchesCache.push({ ...b, mode }));
+        (md.students || []).forEach(s => studentsCache.push(s));
+        Object.entries(md.attendance || {}).forEach(([k, v]) => {
+          // v6 values could be a plain string status or an object
+          const day = {};
+          Object.entries(v).forEach(([sid, rec]) => {
+            day[sid] = typeof rec === 'string' ? { status: rec } : rec;
+          });
+          attendanceCache[k] = day;
+        });
+        Object.keys(md.cancelled || {}).forEach(k => { cancelledCache[k] = true; });
+      });
+      saveToLocalStorage(); // upgrade storage to v7 format
+    }
+  } catch (e) {
+    console.error('LocalStorage load failed', e);
+  }
+}
+
+function saveToLocalStorage() {
+  try {
+    localStorage.setItem('tt_state_v7', JSON.stringify({
+      batches: batchesCache,
+      students: studentsCache,
+      attendance: attendanceCache,
+      fees: feesCache,
+      cancelled: cancelledCache
+    }));
+  } catch (e) {
+    console.error('LocalStorage save failed', e);
+  }
+}
 
 // ============================================
 // MODE
@@ -502,7 +701,6 @@ function switchMode(mode) {
   currentMode = mode;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
   goHome();
-  toast(`Switched to ${mode.toUpperCase()}`);
 }
 
 // ============================================
@@ -532,7 +730,6 @@ function goToBatch(batchId) {
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 function generateMonthDates(year, month, dayNames) {
-  // Generate all dates in the given month that fall on the specified days of week
   const dates = [];
   const dayIndexes = dayNames.map(d => DAY_NAMES.indexOf(d));
   const lastDay = new Date(year, month + 1, 0).getDate();
@@ -565,25 +762,26 @@ function changeMonth(delta) {
 // RENDER: HOME
 // ============================================
 function renderHome() {
-  const d = data();
+  const batches = batchesCache.filter(b => b.mode === currentMode);
   let totalAttended = 0, totalPossible = 0;
-  Object.values(d.attendance).forEach(day => {
+  
+  Object.values(attendanceCache).forEach(day => {
     Object.values(day).forEach(rec => {
       totalPossible++;
-      if (rec.status === 'present' || rec.status === 'recording' || rec.status === 'alternate') totalAttended++;
+      if (['present', 'recording', 'alternate'].includes(rec.status)) totalAttended++;
     });
   });
   const avgPct = totalPossible ? Math.round((totalAttended / totalPossible) * 100) : 0;
 
   document.getElementById('stats').innerHTML = `
-    <div class="stat-card"><div class="stat-value">${d.batches.length}</div><div class="stat-label">Batches</div></div>
-    <div class="stat-card"><div class="stat-value">${d.students.length}</div><div class="stat-label">Students</div></div>
+    <div class="stat-card"><div class="stat-value">${batches.length}</div><div class="stat-label">Batches</div></div>
+    <div class="stat-card"><div class="stat-value">${studentsCache.filter(s => batches.some(b => b.id === s.batchId)).length}</div><div class="stat-label">Students</div></div>
     <div class="stat-card"><div class="stat-value">${totalAttended}</div><div class="stat-label">Total Attended</div></div>
     <div class="stat-card"><div class="stat-value">${avgPct}%</div><div class="stat-label">Avg Attendance</div></div>
   `;
 
   const section = document.getElementById('batches-section');
-  if (d.batches.length === 0) {
+  if (batches.length === 0) {
     section.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">📚</div>
@@ -600,23 +798,37 @@ function renderHome() {
       <button class="btn btn-primary btn-sm" onclick="openAddBatchModal()">+ New Batch</button>
     </div>
     <div class="batches-grid">
-      ${d.batches.map(b => batchCardHTML(b)).join('')}
+      ${batches.map(b => batchCardHTML(b)).join('')}
     </div>`;
 }
 
 function batchCardHTML(b) {
-  const count = data().students.filter(s => s.batchId === b.id).length;
+  const count = studentsCache.filter(s => s.batchId === b.id).length;
   const time = formatTime(b.time, b.ampm);
   const dur = formatDuration(b.duration);
-  const daysStr = b.days.map(d => d.slice(0, 3)).join(', ');
+  
+  let info = '';
+  if (b.mode === 'online') {
+    const daysStr = b.days.map(d => d.slice(0, 3)).join(', ');
+    info = `
+      <div class="batch-info-row"><div class="batch-info-icon">📅</div><div>${daysStr}</div></div>
+      <div class="batch-info-row"><div class="batch-info-icon">⏰</div><div>${time} · ${dur}</div></div>
+      <div class="batch-info-row"><div class="batch-info-icon">💰</div><div>${b.feePerClass != null ? '₹' + b.feePerClass + '/class' : 'Per-student fees'}</div></div>
+    `;
+  } else {
+    const grades = b.selectedGrades.join(', ');
+    const daysStr = (b.days || []).map(d => d.slice(0, 3)).join(', ');
+    info = `
+      <div class="batch-info-row"><div class="batch-info-icon">📚</div><div>${b.curriculum} · Grades ${grades}</div></div>
+      <div class="batch-info-row"><div class="batch-info-icon">📅</div><div>${daysStr || '—'}${b.time ? ' · ' + time : ''}</div></div>
+      <div class="batch-info-row"><div class="batch-info-icon">💰</div><div>₹${b.monthlyFee}/mo default</div></div>
+    `;
+  }
+
   return `
     <div class="batch-card" onclick="goToBatch('${b.id}')">
-      <div class="batch-card-title">Grade ${b.grade} · ${b.batchType}</div>
-      <div class="batch-card-info">
-        <div class="batch-info-row"><div class="batch-info-icon">📅</div><div>${daysStr}</div></div>
-        <div class="batch-info-row"><div class="batch-info-icon">⏰</div><div>${time} · ${dur}</div></div>
-        ${b.notes ? `<div class="batch-info-row"><div class="batch-info-icon">📝</div><div>${escapeHtml(b.notes)}</div></div>` : ''}
-      </div>
+      <div class="batch-card-title">${batchTitle(b)}</div>
+      <div class="batch-card-info">${info}</div>
       <div class="batch-card-footer">
         <div class="student-count">👥 ${count} student${count !== 1 ? 's' : ''}</div>
         <div class="batch-card-actions">
@@ -628,63 +840,72 @@ function batchCardHTML(b) {
 }
 
 // ============================================
-// RENDER: DETAIL (THE BIG ONE)
+// RENDER: DETAIL
 // ============================================
 function renderDetail() {
-  const d = data();
-  const batch = d.batches.find(b => b.id === currentBatchId);
+  const batch = batchesCache.find(b => b.id === currentBatchId);
   if (!batch) { goHome(); return; }
+  const isOffline = batch.mode === 'offline';
 
-  document.getElementById('detail-title').textContent = `Grade ${batch.grade} · ${batch.batchType}`;
+  document.getElementById('detail-title').textContent = batchTitle(batch);
+
   const time = formatTime(batch.time, batch.ampm);
-  document.getElementById('detail-meta').textContent = `${batch.days.join(', ')} · ${time} · ${formatDuration(batch.duration)}`;
+  const schedule = `${(batch.days || []).join(', ')} · ${time} · ${formatDuration(batch.duration)}`;
+  let meta = isOffline
+    ? `${batch.curriculum} · Grades ${batch.selectedGrades.join(', ')} · ${schedule}`
+    : schedule;
+  document.getElementById('detail-meta').textContent = meta;
 
-  // Month label
   const monthLabel = currentMonth.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
   document.getElementById('month-label').textContent = monthLabel;
 
-  // Generate dates for THIS month from schedule
-  const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days);
-
-  // Also include any extra classes added for this batch+month
+  // Generate dates from the recurring schedule (BOTH modes now track attendance)
+  const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days || []);
   const monthPrefix = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
-  const extras = Object.keys(d.attendance)
+  const extras = Object.keys(attendanceCache)
     .filter(k => k.startsWith(batch.id + '_') && k.includes(monthPrefix))
     .map(k => k.substring(batch.id.length + 1))
     .filter(date => !scheduled.includes(date));
-
   const allDates = [...scheduled, ...extras].sort();
-
-  // Filter out cancelled dates from "active" for stats
   const activeDates = allDates.filter(date => !isCancelled(batch.id, date));
-
-  const students = d.students.filter(s => s.batchId === batch.id);
+  const students = studentsCache.filter(s => s.batchId === batch.id);
 
   // Stats
-  let totalAttended = 0, totalPossible = 0, totalFee = 0;
+  let totalAttended = 0, totalPossible = 0;
   students.forEach(s => {
     activeDates.forEach(date => {
       const rec = getAttendance(batch.id, date, s.id);
       if (rec) totalPossible++;
-      if (rec && ['present', 'recording', 'alternate'].includes(rec.status)) {
-        totalAttended++;
-        totalFee += (s.fee || 0);
-      }
+      if (rec && ['present', 'recording', 'alternate'].includes(rec.status)) totalAttended++;
     });
   });
   const pct = totalPossible ? Math.round((totalAttended / totalPossible) * 100) : 0;
+  // Fees: online = attended × per-class; offline = each student's own monthly fee (summed)
+  const totalFee = isOffline
+    ? students.reduce((sum, s) => sum + (s.fee || 0), 0)
+    : students.reduce((sum, s) => {
+        let att = 0;
+        activeDates.forEach(date => { const r = getAttendance(batch.id, date, s.id); if (r && ['present','recording','alternate'].includes(r.status)) att++; });
+        return sum + att * (s.fee || 0);
+      }, 0);
 
-  document.getElementById('month-info').innerHTML = `${activeDates.length} class${activeDates.length !== 1 ? 'es' : ''} this month · ${students.length} student${students.length !== 1 ? 's' : ''}`;
+  document.getElementById('month-info').innerHTML =
+    `${activeDates.length} class${activeDates.length !== 1 ? 'es' : ''} this month · ${students.length} student${students.length !== 1 ? 's' : ''}`;
 
   document.getElementById('detail-stats').innerHTML = `
     <div class="stat-card"><div class="stat-value">${students.length}</div><div class="stat-label">Students</div></div>
     <div class="stat-card"><div class="stat-value">${activeDates.length}</div><div class="stat-label">Classes</div></div>
     <div class="stat-card"><div class="stat-value">${totalAttended}</div><div class="stat-label">Total Attended</div></div>
-    <div class="stat-card"><div class="stat-value">₹${totalFee}</div><div class="stat-label">Total Fees</div></div>
+    <div class="stat-card"><div class="stat-value">₹${totalFee}</div><div class="stat-label">${isOffline ? 'Monthly Fees' : 'Total Fees'}</div></div>
     <div class="stat-card"><div class="stat-value">${pct}%</div><div class="stat-label">Avg Rate</div></div>
   `;
 
+  // Extra class + mark all now apply to BOTH modes
+  document.getElementById('extra-class-btn').classList.remove('hidden');
+  document.getElementById('mark-all-btn').classList.remove('hidden');
+
   const content = document.getElementById('detail-content');
+
   if (students.length === 0) {
     content.innerHTML = `
       <div class="empty-state">
@@ -693,6 +914,7 @@ function renderDetail() {
         <div class="empty-text">Add students to start tracking their attendance</div>
         <button class="btn btn-primary" onclick="openStudentModal()">+ Add First Student</button>
       </div>`;
+    renderFeeStatus();
     return;
   }
 
@@ -701,13 +923,14 @@ function renderDetail() {
       <div class="empty-state">
         <div class="empty-icon">📅</div>
         <div class="empty-title">No classes scheduled in ${monthLabel}</div>
-        <div class="empty-text">This batch runs on ${batch.days.join(', ')} — those days don't fall in this month, or you can add an extra class.</div>
+        <div class="empty-text">This batch runs on ${(batch.days||[]).join(', ') || '—'} — those days don't fall in this month, or you can add an extra class.</div>
         <button class="btn btn-primary" onclick="openExtraClassModal()">+ Add Extra Class</button>
       </div>`;
+    renderFeeStatus();
     return;
   }
 
-  // Build attendance table
+  // Build the attendance table (shared by both modes)
   let html = `<div class="table-wrap"><table>`;
   html += `<thead><tr><th>Student</th><th class="center">Stats</th>`;
   allDates.forEach(date => {
@@ -731,13 +954,12 @@ function renderDetail() {
   html += `<th class="center">Actions</th></tr></thead><tbody>`;
 
   students.forEach(s => {
-    let attended = 0, possible = 0;
+    let attended = 0;
     activeDates.forEach(date => {
       const rec = getAttendance(batch.id, date, s.id);
-      if (rec) possible++;
       if (rec && ['present', 'recording', 'alternate'].includes(rec.status)) attended++;
     });
-    const fee = attended * (s.fee || 0);
+    const feeLine = isOffline ? `₹${s.fee}/mo` : `₹${attended * (s.fee || 0)}`;
 
     html += `<tr>
       <td>
@@ -746,7 +968,7 @@ function renderDetail() {
       </td>
       <td class="center">
         <div style="font-weight:700;color:var(--success)">${attended}/${activeDates.length}</div>
-        <div style="font-size:11px;color:var(--text-dim)">₹${fee}</div>
+        <div style="font-size:11px;color:var(--text-dim)">${feeLine}</div>
       </td>`;
 
     allDates.forEach(date => {
@@ -768,6 +990,126 @@ function renderDetail() {
 
   html += `</tbody></table></div>`;
   content.innerHTML = html;
+
+  renderFeeStatus();
+}
+
+function renderFeeStatus() {
+  const batch = batchesCache.find(b => b.id === currentBatchId);
+  if (!batch) { document.getElementById('fee-status-section').classList.add('hidden'); return; }
+  const isOffline = batch.mode === 'offline';
+
+  const students = studentsCache.filter(s => s.batchId === batch.id);
+  if (students.length === 0) { document.getElementById('fee-status-section').classList.add('hidden'); return; }
+
+  document.getElementById('fee-status-section').classList.remove('hidden');
+  document.getElementById('fee-status-title').textContent = isOffline ? 'Fee Status (Monthly)' : 'Fee Status (This Month)';
+
+  const monthKey = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+
+  // Active class dates this month (for online per-class computation)
+  const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days || []);
+  const extras = Object.keys(attendanceCache)
+    .filter(k => k.startsWith(batch.id + '_') && k.includes(monthKey))
+    .map(k => k.substring(batch.id.length + 1))
+    .filter(date => !scheduled.includes(date));
+  const activeDates = [...scheduled, ...extras].filter(d => !isCancelled(batch.id, d));
+
+  // Fee amount for a student this month
+  const amountFor = (s) => {
+    if (isOffline) return s.fee || 0;
+    let att = 0;
+    activeDates.forEach(date => { const r = getAttendance(batch.id, date, s.id); if (r && ['present','recording','alternate'].includes(r.status)) att++; });
+    return att * (s.fee || 0);
+  };
+
+  const totalDue = students.reduce((sum, s) => sum + amountFor(s), 0);
+  const totalPaid = students.reduce((sum, s) => {
+    const f = feesCache[`${s.id}_${monthKey}`];
+    return sum + (f && f.paid ? amountFor(s) : 0);
+  }, 0);
+
+  const feeColLabel = isOffline ? 'Monthly Fee' : 'Fee This Month';
+  let html = `<div class="table-wrap" style="overflow-x: auto;"><table class="fee-table">`;
+  html += `<thead><tr><th>Student</th><th class="center">${feeColLabel}</th><th class="center">Paid</th><th class="center">Paid Date</th></tr></thead><tbody>`;
+
+  students.forEach(s => {
+    const fee = feesCache[`${s.id}_${monthKey}`] || { paid: false, paidDate: null };
+    const amt = amountFor(s);
+    const sub = isOffline ? '' : `<div style="font-size:10px;color:var(--text-dim)">@ ₹${s.fee}/class</div>`;
+    html += `<tr>
+      <td>${escapeHtml(s.name)}</td>
+      <td class="center">₹${amt}${sub}</td>
+      <td class="center">
+        <input type="checkbox" ${fee.paid ? 'checked' : ''} onchange="toggleFeePaid('${s.id}', '${monthKey}', this.checked)" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--success);">
+      </td>
+      <td class="center">
+        <input type="date" value="${fee.paidDate || ''}" onchange="updateFeeDate('${s.id}', '${monthKey}', this.value)" style="padding: 6px 10px; background: rgba(20, 20, 40, 0.5); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: inherit; font-size: 12px; cursor: pointer;" ${!fee.paid ? 'disabled' : ''}>
+      </td>
+    </tr>`;
+  });
+
+  html += `</tbody><tfoot><tr style="border-top:2px solid var(--border)">
+    <td style="font-weight:700">Total</td>
+    <td class="center" style="font-weight:700">₹${totalDue}</td>
+    <td colspan="2" style="font-size:12px;color:var(--text-dim)">Collected: ₹${totalPaid} · Outstanding: ₹${totalDue - totalPaid}</td>
+  </tr></tfoot></table></div>`;
+  document.getElementById('fee-status-content').innerHTML = html;
+}
+
+// ============================================
+// FEE OPERATIONS
+// ============================================
+async function toggleFeePaid(studentId, monthKey, paid) {
+  const key = `${studentId}_${monthKey}`;
+  const [batchId, month] = monthKey.split('_');
+  const batch = batchesCache.find(b => b.id === currentBatchId);
+
+  if (synced) {
+    const existing = await sbClient.from('fees').select('id').eq('studentId', studentId).eq('batchId', currentBatchId).eq('month', monthKey).single();
+    
+    if (existing.data) {
+      await sbClient.from('fees').update({ paid }).eq('studentId', studentId).eq('batchId', currentBatchId).eq('month', monthKey);
+    } else {
+      await sbClient.from('fees').insert([{
+        id: `${studentId}_${monthKey}`,
+        studentId,
+        batchId: currentBatchId,
+        month: monthKey,
+        paid,
+        paidDate: paid ? formatDateKey(new Date()) : null
+      }]);
+    }
+  }
+
+  feesCache[key] = { ...feesCache[key], paid, paidDate: paid ? formatDateKey(new Date()) : null };
+  saveToLocalStorage();
+  renderFeeStatus();
+}
+
+async function updateFeeDate(studentId, monthKey, paidDate) {
+  const key = `${studentId}_${monthKey}`;
+  
+  if (synced) {
+    const existing = await sbClient.from('fees').select('id').eq('studentId', studentId).eq('batchId', currentBatchId).eq('month', monthKey).single();
+    
+    if (existing.data) {
+      await sbClient.from('fees').update({ paidDate }).eq('studentId', studentId).eq('batchId', currentBatchId).eq('month', monthKey);
+    } else {
+      await sbClient.from('fees').insert([{
+        id: `${studentId}_${monthKey}`,
+        studentId,
+        batchId: currentBatchId,
+        month: monthKey,
+        paid: true,
+        paidDate
+      }]);
+    }
+  }
+
+  feesCache[key] = { ...feesCache[key], paidDate };
+  saveToLocalStorage();
+  renderFeeStatus();
 }
 
 // ============================================
@@ -775,7 +1117,7 @@ function renderDetail() {
 // ============================================
 function getAttendance(batchId, date, studentId) {
   const key = `${batchId}_${date}`;
-  const day = data().attendance[key];
+  const day = attendanceCache[key];
   return day ? day[studentId] || null : null;
 }
 
@@ -785,41 +1127,54 @@ function openAttModal(batchId, date, studentId) {
     return;
   }
   attendanceContext = { batchId, date, studentId };
-  const student = data().students.find(s => s.id === studentId);
+  const student = studentsCache.find(s => s.id === studentId);
   const dStr = formatDateNice(date);
   document.getElementById('att-modal-title').textContent = `Mark ${student.name}`;
   document.getElementById('att-modal-subtitle').textContent = `for ${dStr}`;
   openModal('modal-att');
 }
 
-function setAttendance(status) {
+async function setAttendance(status) {
   if (!attendanceContext) return;
   const { batchId, date, studentId } = attendanceContext;
   const key = `${batchId}_${date}`;
-  if (!data().attendance[key]) data().attendance[key] = {};
+  
+  if (!attendanceCache[key]) attendanceCache[key] = {};
 
   if (status === null) {
-    delete data().attendance[key][studentId];
+    delete attendanceCache[key][studentId];
+    if (synced) {
+      await sbClient.from('attendance').delete().eq('batchId', batchId).eq('date', date).eq('studentId', studentId);
+    }
   } else {
-    data().attendance[key][studentId] = { status };
+    attendanceCache[key][studentId] = { status };
+    if (synced) {
+      await sbClient.from('attendance').upsert({
+        id: `${batchId}_${date}_${studentId}`,
+        batchId, date, studentId,
+        status,
+        alternateDate: null,
+        note: null
+      }, { onConflict: 'id' });
+    }
   }
-  save();
+  
+  saveToLocalStorage();
   closeModal('modal-att');
   renderDetail();
 }
 
 function askAlternate() {
-  // Pre-fill with the same date as default
   document.getElementById('f-alt-date').value = attendanceContext.date;
   document.getElementById('f-alt-note').value = '';
   document.getElementById('alt-error').classList.remove('show');
-  const student = data().students.find(s => s.id === attendanceContext.studentId);
+  const student = studentsCache.find(s => s.id === attendanceContext.studentId);
   document.getElementById('alt-subtitle').textContent = `${student.name} was supposed to attend on ${formatDateNice(attendanceContext.date)}. When did they attend instead?`;
   closeModal('modal-att');
   openModal('modal-alt');
 }
 
-function saveAlternate() {
+async function saveAlternate() {
   const altDate = document.getElementById('f-alt-date').value;
   const note = document.getElementById('f-alt-note').value.trim();
   const errEl = document.getElementById('alt-error');
@@ -832,24 +1187,36 @@ function saveAlternate() {
 
   const { batchId, date, studentId } = attendanceContext;
   const key = `${batchId}_${date}`;
-  if (!data().attendance[key]) data().attendance[key] = {};
-  data().attendance[key][studentId] = {
+  if (!attendanceCache[key]) attendanceCache[key] = {};
+  
+  attendanceCache[key][studentId] = {
     status: 'alternate',
     alternateDate: altDate,
     note
   };
-  save();
+
+  if (synced) {
+    await sbClient.from('attendance').upsert({
+      id: `${batchId}_${date}_${studentId}`,
+      batchId, date, studentId,
+      status: 'alternate',
+      alternateDate: altDate,
+      note
+    }, { onConflict: 'id' });
+  }
+
+  saveToLocalStorage();
   closeModal('modal-alt');
   renderDetail();
   toast('Alternate class recorded');
 }
 
 function markAllPresent() {
-  const batch = data().batches.find(b => b.id === currentBatchId);
-  const students = data().students.filter(s => s.batchId === batch.id);
+  const batch = batchesCache.find(b => b.id === currentBatchId);
+  const students = studentsCache.filter(s => s.batchId === batch.id);
   const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days);
   const monthPrefix = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
-  const extras = Object.keys(data().attendance)
+  const extras = Object.keys(attendanceCache)
     .filter(k => k.startsWith(batch.id + '_') && k.includes(monthPrefix))
     .map(k => k.substring(batch.id.length + 1))
     .filter(date => !scheduled.includes(date));
@@ -865,50 +1232,66 @@ function markAllPresent() {
   allDates.forEach(date => {
     if (isCancelled(batch.id, date)) return;
     const key = `${batch.id}_${date}`;
-    if (!data().attendance[key]) data().attendance[key] = {};
+    if (!attendanceCache[key]) attendanceCache[key] = {};
     students.forEach(s => {
-      if (!data().attendance[key][s.id]) {
-        data().attendance[key][s.id] = { status: 'present' };
+      if (!attendanceCache[key][s.id]) {
+        attendanceCache[key][s.id] = { status: 'present' };
+        if (synced) {
+          sbClient.from('attendance').upsert({
+            id: `${batch.id}_${date}_${s.id}`,
+            batchId: batch.id,
+            date,
+            studentId: s.id,
+            status: 'present'
+          }, { onConflict: 'id' });
+        }
         count++;
       }
     });
   });
-  save();
+  
+  saveToLocalStorage();
   renderDetail();
   toast(`Marked ${count} cells present`);
 }
 
-// ============================================
-// CANCEL CLASS
-// ============================================
 function isCancelled(batchId, date) {
-  return data().cancelled[`${batchId}_${date}`] === true;
+  return cancelledCache[`${batchId}_${date}`] === true;
 }
 
-function toggleCancelDate(batchId, date) {
+async function toggleCancelDate(batchId, date) {
   const key = `${batchId}_${date}`;
-  if (data().cancelled[key]) {
-    delete data().cancelled[key];
+  if (cancelledCache[key]) {
+    delete cancelledCache[key];
+    if (synced) {
+      await sbClient.from('cancelled_dates').delete().eq('batchId', batchId).eq('date', date);
+    }
     toast('Class restored');
   } else {
-    data().cancelled[key] = true;
+    cancelledCache[key] = true;
+    if (synced) {
+      await sbClient.from('cancelled_dates').insert([{
+        id: `${batchId}_${date}`,
+        batchId,
+        date
+      }]);
+    }
     toast('Class cancelled');
   }
-  save();
+  saveToLocalStorage();
   renderDetail();
 }
 
 // ============================================
-// EXTRA CLASS (makeup / one-off)
+// EXTRA CLASS
 // ============================================
 function openExtraClassModal() {
-  // Default to today
   document.getElementById('f-extra-date').value = formatDateKey(new Date());
   document.getElementById('extra-error').classList.remove('show');
   openModal('modal-extra');
 }
 
-function saveExtraClass() {
+async function saveExtraClass() {
   const date = document.getElementById('f-extra-date').value;
   const errEl = document.getElementById('extra-error');
   if (!date) {
@@ -917,15 +1300,18 @@ function saveExtraClass() {
     return;
   }
   const key = `${currentBatchId}_${date}`;
-  if (data().attendance[key]) {
+  if (attendanceCache[key]) {
     errEl.textContent = 'A class already exists on that date';
     errEl.classList.add('show');
     return;
   }
-  data().attendance[key] = {};
-  save();
+  
+  attendanceCache[key] = {};
+  if (synced) {
+    // Just need to initialize - attendance records will be created when marked
+  }
+  saveToLocalStorage();
 
-  // Jump to that date's month
   const dObj = new Date(date + 'T00:00:00');
   currentMonth = new Date(dObj.getFullYear(), dObj.getMonth(), 1);
 
@@ -940,46 +1326,247 @@ function saveExtraClass() {
 function openAddBatchModal() {
   editingBatchId = null;
   selectedDays = [];
+  selectedGrades = [];
   document.getElementById('batch-modal-title').textContent = 'Create New Batch';
   document.getElementById('save-batch-btn').textContent = 'Create Batch';
-  ['f-grade','f-batchtype','f-hours','f-minutes','f-duration','f-notes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('f-ampm').value = 'PM';
-  document.querySelectorAll('#days-grid .day-check').forEach(d => {
-    d.classList.remove('checked');
-    d.querySelector('input').checked = false;
-  });
-  document.getElementById('batch-error').classList.remove('show');
-  document.getElementById('time-preview').classList.remove('show');
+  renderBatchModalFields();
   openModal('modal-batch');
+}
+
+function renderBatchModalFields() {
+  const isOnline = currentMode === 'online';
+  let html = '';
+
+  if (isOnline) {
+    // ONLINE: a single Grade + Batch (each online batch is one grade)
+    html += `
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Grade</label>
+          <select class="form-select" id="f-grade">
+            <option value="">Select...</option>
+            ${Array.from({length: 12}, (_, i) => `<option value="${i+1}">Grade ${i+1}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Batch</label>
+          <select class="form-select" id="f-batchtype">
+            <option value="">Select...</option>
+            ${['Batch 1', 'Batch 2', 'Batch 3', 'Batch 4'].map(b => `<option value="${b}">${b}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Days of the Week (recurring)</label>
+        <div class="days-grid" id="days-grid">
+          ${DAY_NAMES.map(day => `
+            <div class="day-check" onclick="toggleDay(this, '${day}')">
+              <input type="checkbox">
+              <label>${day}</label>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Class Time</label>
+        <div class="time-picker">
+          <input type="text" inputmode="numeric" maxlength="2" class="time-input" id="f-hours" placeholder="7" oninput="updateTimePreview()">
+          <span class="time-separator">:</span>
+          <input type="text" inputmode="numeric" maxlength="2" class="time-input" id="f-minutes" placeholder="15" oninput="updateTimePreview()">
+          <select class="ampm-select" id="f-ampm" onchange="updateTimePreview()">
+            <option value="AM">AM</option>
+            <option value="PM" selected>PM</option>
+          </select>
+        </div>
+        <div class="time-preview" id="time-preview"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Duration</label>
+        <select class="form-select" id="f-duration">
+          <option value="">Select...</option>
+          ${[30, 45, 60, 75, 90, 120].map(m => {
+            let label = m < 60 ? `${m} minutes` : m === 60 ? '1 hour' : `${Math.floor(m/60)} hour ${m % 60} min`.replace(' 0 min', '');
+            return `<option value="${m}">${label}</option>`;
+          }).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fee per Class (₹)</label>
+        <input type="number" class="form-input" id="f-fee-online" value="500" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes (Optional)</label>
+        <input type="text" class="form-input" id="f-notes" placeholder="e.g., Advanced batch, Zoom link...">
+      </div>
+    `;
+  } else {
+    // OFFLINE: Curriculum + Batch, mixed grades via chip selector (no single Grade dropdown)
+    html += `
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Curriculum</label>
+          <select class="form-select" id="f-curriculum">
+            <option value="">Select...</option>
+            <option value="CBSE">CBSE</option>
+            <option value="Cambridge">Cambridge</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Batch</label>
+          <select class="form-select" id="f-batchtype">
+            <option value="">Select...</option>
+            ${['Batch 1', 'Batch 2', 'Batch 3', 'Batch 4'].map(b => `<option value="${b}">${b}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Grades in this batch</label>
+        <div class="grade-multiselect">
+          <div class="grade-chips" id="grade-chips"></div>
+          <button type="button" class="add-grade-btn" id="add-grade-btn" onclick="toggleGradeDropdown(event)">+ Add grade</button>
+          <div class="grade-dropdown hidden" id="grade-dropdown"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Days of the Week (recurring)</label>
+        <div class="days-grid" id="days-grid">
+          ${DAY_NAMES.map(day => `
+            <div class="day-check" onclick="toggleDay(this, '${day}')">
+              <input type="checkbox">
+              <label>${day}</label>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Class Time</label>
+        <div class="time-picker">
+          <input type="text" inputmode="numeric" maxlength="2" class="time-input" id="f-hours" placeholder="4" oninput="updateTimePreview()">
+          <span class="time-separator">:</span>
+          <input type="text" inputmode="numeric" maxlength="2" class="time-input" id="f-minutes" placeholder="00" oninput="updateTimePreview()">
+          <select class="ampm-select" id="f-ampm" onchange="updateTimePreview()">
+            <option value="AM">AM</option>
+            <option value="PM" selected>PM</option>
+          </select>
+        </div>
+        <div class="time-preview" id="time-preview"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Duration</label>
+        <select class="form-select" id="f-duration">
+          <option value="">Select...</option>
+          ${[30, 45, 60, 75, 90, 120].map(m => {
+            let label = m < 60 ? `${m} minutes` : m === 60 ? '1 hour' : `${Math.floor(m/60)} hour ${m % 60} min`.replace(' 0 min', '');
+            return `<option value="${m}">${label}</option>`;
+          }).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Default Monthly Fee (₹) — prefills each new student (editable per student)</label>
+        <input type="number" class="form-input" id="f-fee-offline" value="3000" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes (Optional)</label>
+        <input type="text" class="form-input" id="f-notes" placeholder="e.g., Foundation batch...">
+      </div>
+    `;
+  }
+
+  document.getElementById('batch-mode-fields').innerHTML = html;
+
+  // Pre-fill when editing
+  if (editingBatchId) {
+    const b = batchesCache.find(x => x.id === editingBatchId);
+    document.getElementById('f-batchtype').value = b.batchType;
+    if (isOnline) {
+      document.getElementById('f-grade').value = b.grade;
+      document.getElementById('f-hours').value = b.time.split(':')[0];
+      document.getElementById('f-minutes').value = b.time.split(':')[1];
+      document.getElementById('f-ampm').value = b.ampm;
+      document.getElementById('f-duration').value = b.duration;
+      document.getElementById('f-fee-online').value = b.feePerClass;
+      document.getElementById('f-notes').value = b.notes || '';
+      selectedDays = [...b.days];
+      document.querySelectorAll('#days-grid .day-check').forEach(d => {
+        const label = d.querySelector('label').textContent;
+        const checked = b.days.includes(label);
+        d.classList.toggle('checked', checked);
+        d.querySelector('input').checked = checked;
+      });
+      updateTimePreview();
+    } else {
+      document.getElementById('f-curriculum').value = b.curriculum;
+      document.getElementById('f-fee-offline').value = b.monthlyFee;
+      document.getElementById('f-notes').value = b.notes || '';
+      selectedGrades = [...(b.selectedGrades || [])];
+      // schedule fields (offline now tracks attendance too)
+      if (b.time) {
+        document.getElementById('f-hours').value = b.time.split(':')[0];
+        document.getElementById('f-minutes').value = b.time.split(':')[1];
+      }
+      document.getElementById('f-ampm').value = b.ampm || 'PM';
+      document.getElementById('f-duration').value = b.duration || '';
+      selectedDays = [...(b.days || [])];
+      document.querySelectorAll('#days-grid .day-check').forEach(d => {
+        const label = d.querySelector('label').textContent;
+        const checked = (b.days || []).includes(label);
+        d.classList.toggle('checked', checked);
+        d.querySelector('input').checked = checked;
+      });
+      updateTimePreview();
+    }
+  } else {
+    selectedGrades = [];
+    selectedDays = [];
+  }
+
+  if (!isOnline) renderGradeChips();
+}
+
+// ---- Chip-based grade multiselect (offline) ----
+function renderGradeChips() {
+  const chipsEl = document.getElementById('grade-chips');
+  const dropEl = document.getElementById('grade-dropdown');
+  if (!chipsEl || !dropEl) return;
+
+  // Sort selected grades numerically for display
+  const sorted = [...selectedGrades].sort((a, b) => parseInt(a) - parseInt(b));
+  chipsEl.innerHTML = sorted.length
+    ? sorted.map(g => `<span class="grade-chip">Grade ${g}<span class="chip-x" onclick="removeGrade('${g}')">×</span></span>`).join('')
+    : `<span style="color:var(--text-dim);font-size:13px">No grades added yet</span>`;
+
+  // Dropdown shows only grades not already selected
+  const remaining = Array.from({length: 12}, (_, i) => String(i + 1)).filter(g => !selectedGrades.includes(g));
+  dropEl.innerHTML = remaining.length
+    ? remaining.map(g => `<div class="grade-opt" onclick="addGrade('${g}')">${g}</div>`).join('')
+    : `<div class="grade-empty">All grades added</div>`;
+}
+
+function toggleGradeDropdown(e) {
+  if (e) e.stopPropagation();
+  const dropEl = document.getElementById('grade-dropdown');
+  if (dropEl) dropEl.classList.toggle('hidden');
+}
+
+function addGrade(g) {
+  if (!selectedGrades.includes(g)) selectedGrades.push(g);
+  renderGradeChips();
+  const dropEl = document.getElementById('grade-dropdown');
+  if (dropEl) dropEl.classList.add('hidden');
+}
+
+function removeGrade(g) {
+  selectedGrades = selectedGrades.filter(x => x !== g);
+  renderGradeChips();
 }
 
 function openEditBatchModal() { openEditBatchModalById(currentBatchId); }
 
 function openEditBatchModalById(batchId) {
-  const b = data().batches.find(x => x.id === batchId);
-  if (!b) return;
   editingBatchId = batchId;
-  selectedDays = [...b.days];
-
   document.getElementById('batch-modal-title').textContent = 'Edit Batch';
   document.getElementById('save-batch-btn').textContent = 'Save Changes';
-  document.getElementById('f-grade').value = b.grade;
-  document.getElementById('f-batchtype').value = b.batchType;
-  document.getElementById('f-hours').value = b.time.split(':')[0];
-  document.getElementById('f-minutes').value = b.time.split(':')[1];
-  document.getElementById('f-ampm').value = b.ampm;
-  document.getElementById('f-duration').value = b.duration;
-  document.getElementById('f-notes').value = b.notes || '';
-  document.getElementById('batch-error').classList.remove('show');
-
-  document.querySelectorAll('#days-grid .day-check').forEach(d => {
-    const label = d.querySelector('label').textContent;
-    const checked = b.days.includes(label);
-    d.classList.toggle('checked', checked);
-    d.querySelector('input').checked = checked;
-  });
-
-  updateTimePreview();
+  renderBatchModalFields();
   openModal('modal-batch');
 }
 
@@ -994,11 +1581,23 @@ function toggleDay(el, day) {
   }
 }
 
+function toggleGrade(el, grade) {
+  const cb = el.querySelector('input');
+  cb.checked = !cb.checked;
+  el.classList.toggle('checked', cb.checked);
+  if (cb.checked) {
+    if (!selectedGrades.includes(grade)) selectedGrades.push(grade);
+  } else {
+    selectedGrades = selectedGrades.filter(d => d !== grade);
+  }
+}
+
 function updateTimePreview() {
-  const h = document.getElementById('f-hours').value;
-  const m = document.getElementById('f-minutes').value;
-  const ap = document.getElementById('f-ampm').value;
+  const h = document.getElementById('f-hours')?.value;
+  const m = document.getElementById('f-minutes')?.value;
+  const ap = document.getElementById('f-ampm')?.value;
   const preview = document.getElementById('time-preview');
+  if (!preview) return;
   if (h && m) {
     const hh = parseInt(h);
     const mm = parseInt(m);
@@ -1011,62 +1610,148 @@ function updateTimePreview() {
   preview.classList.remove('show');
 }
 
-function saveBatch() {
-  const grade = document.getElementById('f-grade').value;
+async function saveBatch() {
   const batchType = document.getElementById('f-batchtype').value;
-  const hours = document.getElementById('f-hours').value;
-  const minutes = document.getElementById('f-minutes').value;
-  const ampm = document.getElementById('f-ampm').value;
-  const duration = document.getElementById('f-duration').value;
-  const notes = document.getElementById('f-notes').value.trim();
-
   const errEl = document.getElementById('batch-error');
-  if (!grade || !batchType || selectedDays.length === 0 || !hours || !minutes || !duration) {
-    errEl.textContent = 'Please fill all required fields (Grade, Batch, Days, Time, Duration)';
-    errEl.classList.add('show');
-    return;
-  }
-  const hh = parseInt(hours), mm = parseInt(minutes);
-  if (isNaN(hh) || hh < 1 || hh > 12 || isNaN(mm) || mm < 0 || mm > 59) {
-    errEl.textContent = 'Please enter a valid time (Hours 1-12, Minutes 0-59)';
+  const isOnline = currentMode === 'online';
+
+  if (!batchType) {
+    errEl.textContent = 'Please choose a Batch';
     errEl.classList.add('show');
     return;
   }
 
-  const timeStr = `${hh}:${String(mm).padStart(2, '0')}`;
-  const d = data();
+  let batchData = {
+    mode: currentMode,
+    batchType,
+    notes: document.getElementById('f-notes')?.value.trim() || null
+  };
+
+  if (isOnline) {
+    const grade = document.getElementById('f-grade').value;
+    const hours = document.getElementById('f-hours').value;
+    const minutes = document.getElementById('f-minutes').value;
+    const ampm = document.getElementById('f-ampm').value;
+    const duration = document.getElementById('f-duration').value;
+    const fee = parseInt(document.getElementById('f-fee-online').value) || 0;
+
+    if (!grade || selectedDays.length === 0 || !hours || !minutes || !duration) {
+      errEl.textContent = 'Please fill all required fields (Grade, Days, Time, Duration)';
+      errEl.classList.add('show');
+      return;
+    }
+
+    const hh = parseInt(hours), mm = parseInt(minutes);
+    if (isNaN(hh) || hh < 1 || hh > 12 || isNaN(mm) || mm < 0 || mm > 59) {
+      errEl.textContent = 'Invalid time (Hours 1-12, Minutes 0-59)';
+      errEl.classList.add('show');
+      return;
+    }
+
+    batchData = {
+      ...batchData,
+      grade,
+      days: [...selectedDays],
+      time: `${hh}:${String(mm).padStart(2, '0')}`,
+      ampm,
+      duration,
+      feePerClass: fee,
+      curriculum: null,
+      selectedGrades: [],
+      monthlyFee: null
+    };
+  } else {
+    const curriculum = document.getElementById('f-curriculum').value;
+    const fee = parseInt(document.getElementById('f-fee-offline').value) || 0;
+    const hours = document.getElementById('f-hours').value;
+    const minutes = document.getElementById('f-minutes').value;
+    const ampm = document.getElementById('f-ampm').value;
+    const duration = document.getElementById('f-duration').value;
+
+    if (!curriculum || selectedGrades.length === 0) {
+      errEl.textContent = 'Please select curriculum and at least one grade';
+      errEl.classList.add('show');
+      return;
+    }
+    if (selectedDays.length === 0 || !hours || !minutes || !duration) {
+      errEl.textContent = 'Please fill the schedule (Days, Time, Duration)';
+      errEl.classList.add('show');
+      return;
+    }
+    const hh = parseInt(hours), mm = parseInt(minutes);
+    if (isNaN(hh) || hh < 1 || hh > 12 || isNaN(mm) || mm < 0 || mm > 59) {
+      errEl.textContent = 'Invalid time (Hours 1-12, Minutes 0-59)';
+      errEl.classList.add('show');
+      return;
+    }
+
+    // Sort grades numerically; grade field left null (offline batches are mixed-grade)
+    const gradesSorted = [...selectedGrades].sort((a, b) => parseInt(a) - parseInt(b));
+    batchData = {
+      ...batchData,
+      grade: null,
+      curriculum,
+      selectedGrades: gradesSorted,
+      monthlyFee: fee,
+      days: [...selectedDays],
+      time: `${hh}:${String(mm).padStart(2, '0')}`,
+      ampm,
+      duration,
+      feePerClass: null
+    };
+  }
+
+  // DB payload: serialize arrays to JSON strings for the text columns.
+  const toDbPayload = (b) => ({
+    mode: b.mode, grade: b.grade, batchType: b.batchType, notes: b.notes,
+    days: JSON.stringify(b.days || []), time: b.time || '', ampm: b.ampm || '',
+    duration: b.duration || '', feePerClass: b.feePerClass ?? null,
+    curriculum: b.curriculum ?? null,
+    selectedGrades: b.selectedGrades ? JSON.stringify(b.selectedGrades) : null,
+    monthlyFee: b.monthlyFee ?? null
+  });
 
   if (editingBatchId) {
-    const b = d.batches.find(x => x.id === editingBatchId);
-    b.grade = grade; b.batchType = batchType; b.days = [...selectedDays];
-    b.time = timeStr; b.ampm = ampm; b.duration = duration; b.notes = notes;
+    const idx = batchesCache.findIndex(x => x.id === editingBatchId);
+    batchesCache[idx] = { ...batchesCache[idx], ...batchData };
+    if (synced) {
+      const { error } = await sbClient.from('batches').update(toDbPayload(batchData)).eq('id', editingBatchId);
+      if (error) { synced = false; toast('Saved on device (cloud write failed)'); }
+    }
     toast('Batch updated');
   } else {
-    d.batches.push({
-      id: Date.now().toString(),
-      grade, batchType, days: [...selectedDays],
-      time: timeStr, ampm, duration, notes,
-      createdAt: new Date().toISOString()
-    });
+    const id = Date.now().toString();
+    const newBatch = { id, ...batchData, createdAt: new Date().toISOString() };
+    batchesCache.push(newBatch);
+    if (synced) {
+      const { error } = await sbClient.from('batches').insert([{ id, ...toDbPayload(newBatch) }]);
+      if (error) { synced = false; toast('Saved on device (cloud write failed)'); }
+    }
     toast('Batch created');
   }
-  save();
+
+  saveToLocalStorage();
   closeModal('modal-batch');
   if (currentView === 'detail') renderDetail(); else renderHome();
 }
 
-function deleteBatch(batchId) {
-  const b = data().batches.find(x => x.id === batchId);
+async function deleteBatch(batchId) {
+  const b = batchesCache.find(x => x.id === batchId);
   if (!b) return;
-  const studentCount = data().students.filter(s => s.batchId === batchId).length;
-  if (!confirm(`Delete "Grade ${b.grade} ${b.batchType}"?\n\nThis removes ${studentCount} student(s) and all attendance records.`)) return;
+  const studentCount = studentsCache.filter(s => s.batchId === batchId).length;
+  if (!confirm(`Delete "${batchTitle(b)}"?\n\nThis removes ${studentCount} student(s) and all records.`)) return;
 
-  const d = data();
-  d.batches = d.batches.filter(x => x.id !== batchId);
-  d.students = d.students.filter(s => s.batchId !== batchId);
-  Object.keys(d.attendance).forEach(k => { if (k.startsWith(batchId + '_')) delete d.attendance[k]; });
-  Object.keys(d.cancelled).forEach(k => { if (k.startsWith(batchId + '_')) delete d.cancelled[k]; });
-  save();
+  batchesCache = batchesCache.filter(x => x.id !== batchId);
+  studentsCache = studentsCache.filter(s => s.batchId !== batchId);
+  Object.keys(attendanceCache).forEach(k => { if (k.startsWith(batchId + '_')) delete attendanceCache[k]; });
+  Object.keys(feesCache).forEach(k => { if (k.startsWith('_')) { const [sid, month] = k.split('_'); const student = studentsCache.find(s => s.id === sid); if (student && student.batchId === batchId) delete feesCache[k]; } });
+  Object.keys(cancelledCache).forEach(k => { if (k.startsWith(batchId + '_')) delete cancelledCache[k]; });
+
+  if (synced) {
+    await sbClient.from('batches').delete().eq('id', batchId);
+  }
+
+  saveToLocalStorage();
   if (currentBatchId === batchId) goHome(); else renderHome();
   toast('Batch deleted');
 }
@@ -1076,31 +1761,40 @@ function deleteBatch(batchId) {
 // ============================================
 function openStudentModal() {
   editingStudentId = null;
+  const batch = batchesCache.find(b => b.id === currentBatchId);
+  const isOffline = batch && batch.mode === 'offline';
   document.getElementById('student-modal-title').textContent = 'Add Student';
   document.getElementById('save-student-btn').textContent = 'Add Student';
   document.getElementById('s-name').value = '';
   document.getElementById('s-parent').value = '';
   document.getElementById('s-phone').value = '';
-  document.getElementById('s-fee').value = '500';
+  document.getElementById('student-fee-label').textContent = isOffline ? 'Monthly Fee (₹) *' : 'Fee per Class (₹) *';
+  // Prefill from the batch's default monthly fee (offline) so it's quick, but each student is editable.
+  document.getElementById('s-fee').value = isOffline ? (batch.monthlyFee || 0) : 500;
+  document.getElementById('student-fee-group').classList.remove('hidden');
   document.getElementById('student-error').classList.remove('show');
   openModal('modal-student');
 }
 
 function openEditStudentModal(studentId) {
-  const s = data().students.find(x => x.id === studentId);
+  const s = studentsCache.find(x => x.id === studentId);
   if (!s) return;
+  const batch = batchesCache.find(b => b.id === s.batchId);
+  const isOffline = batch && batch.mode === 'offline';
   editingStudentId = studentId;
   document.getElementById('student-modal-title').textContent = 'Edit Student';
   document.getElementById('save-student-btn').textContent = 'Save Changes';
   document.getElementById('s-name').value = s.name;
   document.getElementById('s-parent').value = s.parent || '';
   document.getElementById('s-phone').value = s.phone || '';
-  document.getElementById('s-fee').value = s.fee;
+  document.getElementById('student-fee-label').textContent = isOffline ? 'Monthly Fee (₹) *' : 'Fee per Class (₹) *';
+  document.getElementById('s-fee').value = s.fee || 0;
+  document.getElementById('student-fee-group').classList.remove('hidden');
   document.getElementById('student-error').classList.remove('show');
   openModal('modal-student');
 }
 
-function saveStudent() {
+async function saveStudent() {
   const name = document.getElementById('s-name').value.trim();
   const parent = document.getElementById('s-parent').value.trim();
   const phone = document.getElementById('s-phone').value.trim();
@@ -1112,102 +1806,159 @@ function saveStudent() {
     errEl.classList.add('show');
     return;
   }
-  if (fee < 0) {
-    errEl.textContent = 'Fee must be 0 or more';
-    errEl.classList.add('show');
-    return;
-  }
 
-  const d = data();
   if (editingStudentId) {
-    const s = d.students.find(x => x.id === editingStudentId);
-    s.name = name; s.parent = parent; s.phone = phone; s.fee = fee;
+    const idx = studentsCache.findIndex(x => x.id === editingStudentId);
+    studentsCache[idx] = { ...studentsCache[idx], name, parent, phone, fee };
+    if (synced) {
+      await sbClient.from('students').update({ name, parent, phone, fee }).eq('id', editingStudentId);
+    }
     toast('Student updated');
   } else {
-    d.students.push({
-      id: Date.now().toString(),
-      batchId: currentBatchId,
-      name, parent, phone, fee,
-      createdAt: new Date().toISOString()
-    });
+    const id = Date.now().toString();
+    const newStudent = { id, batchId: currentBatchId, name, parent, phone, fee, createdAt: new Date().toISOString() };
+    studentsCache.push(newStudent);
+    if (synced) {
+      await sbClient.from('students').insert([newStudent]);
+    }
     toast('Student added');
   }
-  save();
+
+  saveToLocalStorage();
   closeModal('modal-student');
   renderDetail();
 }
 
-function deleteStudent(studentId) {
-  const s = data().students.find(x => x.id === studentId);
+async function deleteStudent(studentId) {
+  const s = studentsCache.find(x => x.id === studentId);
   if (!s) return;
-  if (!confirm(`Delete "${s.name}"? Their attendance records will also be removed.`)) return;
-  const d = data();
-  d.students = d.students.filter(x => x.id !== studentId);
-  Object.keys(d.attendance).forEach(k => { if (d.attendance[k][studentId]) delete d.attendance[k][studentId]; });
-  save();
+  if (!confirm(`Delete "${s.name}"? Attendance records will also be removed.`)) return;
+
+  studentsCache = studentsCache.filter(x => x.id !== studentId);
+  Object.keys(attendanceCache).forEach(k => { if (attendanceCache[k][studentId]) delete attendanceCache[k][studentId]; });
+  Object.keys(feesCache).forEach(k => { if (k.startsWith(studentId + '_')) delete feesCache[k]; });
+
+  if (synced) {
+    await sbClient.from('students').delete().eq('id', studentId);
+  }
+
+  saveToLocalStorage();
   renderDetail();
   toast('Student deleted');
 }
 
 // ============================================
-// PARENT MESSAGE
+// MESSAGES
 // ============================================
-let messageText = '';
-
 function openMessageModal(studentId) {
-  const s = data().students.find(x => x.id === studentId);
+  const s = studentsCache.find(x => x.id === studentId);
   if (!s) return;
-  const batch = data().batches.find(b => b.id === s.batchId);
-
-  // Use current viewed month
-  const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days);
-  const monthPrefix = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
-  const extras = Object.keys(data().attendance)
-    .filter(k => k.startsWith(batch.id + '_') && k.includes(monthPrefix))
-    .map(k => k.substring(batch.id.length + 1))
-    .filter(date => !scheduled.includes(date));
-  const allDates = [...scheduled, ...extras].sort().filter(d => !isCancelled(batch.id, d));
-
-  const present = [], absent = [], recording = [], alternate = [];
-  allDates.forEach(date => {
-    const rec = getAttendance(batch.id, date, s.id);
-    if (!rec) return;
-    if (rec.status === 'present') present.push(date);
-    else if (rec.status === 'absent') absent.push(date);
-    else if (rec.status === 'recording') recording.push(date);
-    else if (rec.status === 'alternate') alternate.push({ original: date, alt: rec.alternateDate, note: rec.note });
-  });
-
-  const totalAttended = present.length + recording.length + alternate.length;
-  const totalFee = totalAttended * (s.fee || 0);
-  const pct = allDates.length ? Math.round((totalAttended / allDates.length) * 100) : 0;
-  const monthName = currentMonth.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+  const batch = batchesCache.find(b => b.id === s.batchId);
 
   let msg = `Dear ${s.parent || 'Parent'},\n\n`;
-  msg += `Here is ${s.name}'s attendance summary for ${monthName}:\n\n`;
-  msg += `📚 Batch: Grade ${batch.grade} - ${batch.batchType}\n`;
-  msg += `📅 Total classes: ${allDates.length}\n`;
-  msg += `✅ Attended: ${totalAttended}\n`;
-  if (recording.length) msg += `   • ${recording.length} via recording\n`;
-  if (alternate.length) msg += `   • ${alternate.length} alternate class\n`;
-  msg += `❌ Absent: ${absent.length}\n`;
-  msg += `📊 Attendance: ${pct}%\n\n`;
+  msg += `This is ${s.name}'s attendance summary:\n\n`;
 
-  if (present.length) msg += `Attended live: ${present.map(formatDateShort).join(', ')}\n`;
-  if (recording.length) msg += `Watched recording for: ${recording.map(formatDateShort).join(', ')}\n`;
-  if (alternate.length) {
-    alternate.forEach(a => {
-      msg += `Missed ${formatDateShort(a.original)}, attended alternate class on ${formatDateShort(a.alt)}`;
-      if (a.note) msg += ` (${a.note})`;
-      msg += `\n`;
+  if (batch.mode === 'online') {
+    const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days);
+    const monthPrefix = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+    const extras = Object.keys(attendanceCache)
+      .filter(k => k.startsWith(batch.id + '_') && k.includes(monthPrefix))
+      .map(k => k.substring(batch.id.length + 1))
+      .filter(date => !scheduled.includes(date));
+    const allDates = [...scheduled, ...extras].sort().filter(d => !isCancelled(batch.id, d));
+
+    const present = [], absent = [], recording = [], alternate = [];
+    allDates.forEach(date => {
+      const rec = getAttendance(batch.id, date, s.id);
+      if (!rec) return;
+      if (rec.status === 'present') present.push(date);
+      else if (rec.status === 'absent') absent.push(date);
+      else if (rec.status === 'recording') recording.push(date);
+      else if (rec.status === 'alternate') alternate.push({ original: date, alt: rec.alternateDate, note: rec.note });
     });
+
+    const totalAttended = present.length + recording.length + alternate.length;
+    const totalFee = totalAttended * (s.fee || 0);
+    const pct = allDates.length ? Math.round((totalAttended / allDates.length) * 100) : 0;
+    const monthName = currentMonth.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
+    msg += `📚 Batch: Grade ${batch.grade} - ${batch.batchType}\n`;
+    msg += `📅 Period: ${monthName}\n`;
+    msg += `✅ Classes attended: ${totalAttended} of ${allDates.length}\n`;
+    if (recording.length) msg += `   • ${recording.length} via recording\n`;
+    if (alternate.length) msg += `   • ${alternate.length} alternate class\n`;
+    msg += `❌ Absent: ${absent.length}\n`;
+    msg += `📊 Attendance: ${pct}%\n\n`;
+
+    if (present.length) msg += `Attended live: ${present.map(formatDateShort).join(', ')}\n`;
+    if (recording.length) msg += `Watched recording: ${recording.map(formatDateShort).join(', ')}\n`;
+    if (alternate.length) {
+      alternate.forEach(a => {
+        msg += `Missed ${formatDateShort(a.original)}, attended alternate class on ${formatDateShort(a.alt)}`;
+        if (a.note) msg += ` (${a.note})`;
+        msg += `\n`;
+      });
+    }
+    if (absent.length) msg += `Absent: ${absent.map(formatDateShort).join(', ')}\n`;
+
+    msg += `\n💰 Fee Breakdown:\n`;
+    msg += `${totalAttended} classes × ₹${s.fee} = ₹${totalFee}\n`;
+    const onlineFee = feesCache[`${s.id}_${monthPrefix}`] || { paid: false, paidDate: null };
+    msg += `Status: ${onlineFee.paid ? `✅ Paid on ${formatDateNice(onlineFee.paidDate)}` : '❌ Pending'}\n\n`;
+
+    if (totalAttended === allDates.length && allDates.length > 0) msg += `Perfect attendance! 🌟\n\n`;
+    else if (pct >= 75) msg += `Great job! Keep it up. 👍\n\n`;
+  } else {
+    const monthName = currentMonth.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    const monthKey = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+    const fee = feesCache[`${s.id}_${monthKey}`] || { paid: false, paidDate: null };
+
+    // Attendance for offline (same schedule logic), monthly billing
+    const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days || []);
+    const extras = Object.keys(attendanceCache)
+      .filter(k => k.startsWith(batch.id + '_') && k.includes(monthKey))
+      .map(k => k.substring(batch.id.length + 1))
+      .filter(date => !scheduled.includes(date));
+    const allDates = [...scheduled, ...extras].sort().filter(d => !isCancelled(batch.id, d));
+
+    const present = [], absent = [], recording = [], alternate = [];
+    allDates.forEach(date => {
+      const rec = getAttendance(batch.id, date, s.id);
+      if (!rec) return;
+      if (rec.status === 'present') present.push(date);
+      else if (rec.status === 'absent') absent.push(date);
+      else if (rec.status === 'recording') recording.push(date);
+      else if (rec.status === 'alternate') alternate.push({ original: date, alt: rec.alternateDate, note: rec.note });
+    });
+    const totalAttended = present.length + recording.length + alternate.length;
+    const pct = allDates.length ? Math.round((totalAttended / allDates.length) * 100) : 0;
+
+    msg += `📚 Batch: ${batch.curriculum} - ${batch.batchType}\n`;
+    msg += `🎓 Grades: ${(batch.selectedGrades||[]).join(", ")}\n`;
+    msg += `📅 Period: ${monthName}\n`;
+    msg += `✅ Classes attended: ${totalAttended} of ${allDates.length}\n`;
+    if (recording.length) msg += `   • ${recording.length} via recording\n`;
+    if (alternate.length) msg += `   • ${alternate.length} alternate class\n`;
+    msg += `❌ Absent: ${absent.length}\n`;
+    msg += `📊 Attendance: ${pct}%\n\n`;
+
+    if (present.length) msg += `Attended: ${present.map(formatDateShort).join(', ')}\n`;
+    if (recording.length) msg += `Watched recording: ${recording.map(formatDateShort).join(', ')}\n`;
+    if (alternate.length) {
+      alternate.forEach(a => {
+        msg += `Missed ${formatDateShort(a.original)}, attended alternate class on ${formatDateShort(a.alt)}`;
+        if (a.note) msg += ` (${a.note})`;
+        msg += `\n`;
+      });
+    }
+    if (absent.length) msg += `Absent: ${absent.map(formatDateShort).join(', ')}\n`;
+
+    msg += `\n💰 Monthly Fee: ₹${s.fee}\n`;
+    msg += `Status: ${fee.paid ? `✅ Paid on ${formatDateNice(fee.paidDate)}` : '❌ Pending'}\n\n`;
+
+    if (totalAttended === allDates.length && allDates.length > 0) msg += `Perfect attendance! 🌟\n\n`;
+    else if (pct >= 75) msg += `Great job! Keep it up. 👍\n\n`;
   }
-  if (absent.length) msg += `Absent: ${absent.map(formatDateShort).join(', ')}\n`;
-
-  msg += `\n💰 Fee Due: ₹${totalFee} (${totalAttended} × ₹${s.fee})\n\n`;
-
-  if (totalAttended === allDates.length && allDates.length > 0) msg += `${s.name} had perfect attendance this month! 🌟\n\n`;
-  else if (pct >= 75) msg += `${s.name} is doing well — keep it up! 👍\n\n`;
 
   msg += `Thank you.`;
 
@@ -1234,36 +1985,69 @@ function copyMessage() {
 // EXPORT
 // ============================================
 function exportCSV() {
-  const batch = data().batches.find(b => b.id === currentBatchId);
-  const students = data().students.filter(s => s.batchId === currentBatchId);
-  const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days);
-  const monthPrefix = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
-  const extras = Object.keys(data().attendance)
-    .filter(k => k.startsWith(batch.id + '_') && k.includes(monthPrefix))
-    .map(k => k.substring(batch.id.length + 1))
-    .filter(date => !scheduled.includes(date));
-  const allDates = [...scheduled, ...extras].sort();
+  const batch = batchesCache.find(b => b.id === currentBatchId);
+  const students = studentsCache.filter(s => s.batchId === currentBatchId);
 
   if (students.length === 0) { toast('No students to export'); return; }
 
-  const rows = [['Student', 'Parent', 'Phone', 'Fee/Class', ...allDates, 'Attended', 'Total Fee']];
-  students.forEach(s => {
-    let attended = 0;
-    const row = [s.name, s.parent || '', s.phone || '', s.fee];
-    allDates.forEach(date => {
-      const rec = getAttendance(batch.id, date, s.id);
-      let cell = '—';
-      if (isCancelled(batch.id, date)) cell = 'CANCELLED';
-      else if (rec) {
-        cell = rec.status;
-        if (rec.status === 'alternate' && rec.alternateDate) cell += ` (on ${rec.alternateDate})`;
-        if (['present', 'recording', 'alternate'].includes(rec.status)) attended++;
-      }
-      row.push(cell);
+  let rows = [];
+  if (batch.mode === 'online') {
+    const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days);
+    const monthPrefix = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+    const extras = Object.keys(attendanceCache)
+      .filter(k => k.startsWith(batch.id + '_') && k.includes(monthPrefix))
+      .map(k => k.substring(batch.id.length + 1))
+      .filter(date => !scheduled.includes(date));
+    const allDates = [...scheduled, ...extras].sort();
+
+    rows = [['Student', 'Parent', 'Phone', 'Fee/Class', ...allDates, 'Attended', 'Total Fee', 'Paid', 'Paid Date']];
+    students.forEach(s => {
+      let attended = 0;
+      const row = [s.name, s.parent || '', s.phone || '', s.fee];
+      allDates.forEach(date => {
+        const rec = getAttendance(batch.id, date, s.id);
+        let cell = '—';
+        if (isCancelled(batch.id, date)) cell = 'CANCELLED';
+        else if (rec) {
+          cell = rec.status;
+          if (rec.status === 'alternate' && rec.alternateDate) cell += ` (${rec.alternateDate})`;
+          if (['present', 'recording', 'alternate'].includes(rec.status)) attended++;
+        }
+        row.push(cell);
+      });
+      const fee = feesCache[`${s.id}_${monthPrefix}`] || { paid: false, paidDate: null };
+      row.push(attended, attended * s.fee, fee.paid ? 'Yes' : 'No', fee.paidDate || '');
+      rows.push(row);
     });
-    row.push(attended, attended * s.fee);
-    rows.push(row);
-  });
+  } else {
+    const monthKey = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
+    const scheduled = generateMonthDates(currentMonth.getFullYear(), currentMonth.getMonth(), batch.days || []);
+    const extras = Object.keys(attendanceCache)
+      .filter(k => k.startsWith(batch.id + '_') && k.includes(monthKey))
+      .map(k => k.substring(batch.id.length + 1))
+      .filter(date => !scheduled.includes(date));
+    const allDates = [...scheduled, ...extras].sort();
+
+    rows = [['Student', 'Parent', 'Phone', ...allDates, 'Attended', 'Monthly Fee', 'Paid', 'Paid Date']];
+    students.forEach(s => {
+      let attended = 0;
+      const row = [s.name, s.parent || '', s.phone || ''];
+      allDates.forEach(date => {
+        const rec = getAttendance(batch.id, date, s.id);
+        let cell = '—';
+        if (isCancelled(batch.id, date)) cell = 'CANCELLED';
+        else if (rec) {
+          cell = rec.status;
+          if (rec.status === 'alternate' && rec.alternateDate) cell += ` (${rec.alternateDate})`;
+          if (['present', 'recording', 'alternate'].includes(rec.status)) attended++;
+        }
+        row.push(cell);
+      });
+      const fee = feesCache[`${s.id}_${monthKey}`] || { paid: false, paidDate: null };
+      row.push(attended, s.fee, fee.paid ? 'Yes' : 'No', fee.paidDate || '');
+      rows.push(row);
+    });
+  }
 
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
@@ -1271,7 +2055,7 @@ function exportCSV() {
   const a = document.createElement('a');
   a.href = url;
   const mLabel = currentMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).replace(' ', '');
-  a.download = `Grade${batch.grade}_${batch.batchType.replace(/\s/g, '')}_${mLabel}.csv`;
+  a.download = `${batchFileLabel(batch)}_${mLabel}.csv`;
   a.click();
   URL.revokeObjectURL(url);
   toast('CSV exported');
@@ -1295,6 +2079,17 @@ document.addEventListener('keydown', e => {
 // ============================================
 // UTILS
 // ============================================
+function batchTitle(b) {
+  if (b.mode === 'offline') {
+    const grades = (b.selectedGrades && b.selectedGrades.length) ? ` · Grades ${b.selectedGrades.join(', ')}` : '';
+    return `${b.curriculum || 'Offline'} · ${b.batchType}${grades}`;
+  }
+  return `Grade ${b.grade} · ${b.batchType}`;
+}
+function batchFileLabel(b) {
+  if (b.mode === 'offline') return `${b.curriculum || 'Offline'}_${b.batchType}`.replace(/\s/g, '');
+  return `Grade${b.grade}_${b.batchType}`.replace(/\s/g, '');
+}
 function formatTime(time, ampm) {
   if (!time) return '';
   const [h, m] = time.split(':');
@@ -1332,8 +2127,16 @@ function toast(message) {
 // ============================================
 // INIT
 // ============================================
-load();
-renderHome();
+// Kick off. Even if init fails unexpectedly, guarantee the UI renders.
+init().catch(e => {
+  console.error('init() failed', e);
+  try {
+    loadFromLocalStorage();
+    renderHome();
+    const l = document.getElementById('loading-screen');
+    if (l) l.classList.add('hidden');
+  } catch (_) {}
+});
 </script>
 
 </body>
